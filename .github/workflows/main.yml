@@ -42,6 +42,7 @@ jobs:
         with:
           path: src
       - run: ls -li
+      - run: cd dist && ls -li
       - uses: actions/upload-artifact@v2
         with:
           name: test_tool
