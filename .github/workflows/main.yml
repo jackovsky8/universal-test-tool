@@ -43,6 +43,7 @@ jobs:
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
           path: src
+      - run: pip install --upgrade pip
       - run: ls -li
       - run: cd dist && ls -li
       - run: cd dist && cd linux && ls -li
