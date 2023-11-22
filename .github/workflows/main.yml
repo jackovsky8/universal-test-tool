@@ -57,8 +57,8 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: test_tool
-          path: dist/linux
+          name: test-tool
+          path: dist/linux/cli
           if-no-files-found: error
 
   # build_for_windows:
