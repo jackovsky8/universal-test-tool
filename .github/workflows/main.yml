@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.9', '3.10', '3.11']
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -43,8 +43,8 @@ jobs:
           path: src
       - uses: actions/upload-artifact@v2
         with:
-          name: name-of-artifact
-          path: dist/linux
+          name: test_tool
+          path: src/dist/linux
           
   # tests_linux:
   #   needs: linter
