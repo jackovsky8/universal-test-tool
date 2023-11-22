@@ -60,3 +60,6 @@ def main():  # pragma: no cover
         )
 
     run_tests(args.project, args.calls, args.data)
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

@@ -50,6 +50,7 @@ jobs:
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
           path: src
+          spec: test-tool-linux.spec
       - run: ls -li
       - run: cd dist && ls -li
       - run: cd dist && cd linux && ls -li
