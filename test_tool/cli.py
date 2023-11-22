@@ -1,12 +1,10 @@
 """CLI interface for test_tool project.
-
-Be creative! do whatever you want!
-
-- Install click or typer and create a CLI app
-- Use builtin argparse
-- Start a web application
-- Import things from your .base module
 """
+from argparse import ArgumentParser
+from logging import DEBUG, INFO, basicConfig
+from os import getcwd
+
+from test_tool.base import run_tests
 
 
 def main():  # pragma: no cover
@@ -14,15 +12,49 @@ def main():  # pragma: no cover
     The main function executes on commands:
     `python -m test_tool` and `$ test_tool `.
 
-    This is your program's entry point.
-
-    You can change this function to do whatever you want.
-    Examples:
-        * Run a test suite
-        * Run a server
-        * Do some other stuff
-        * Run a command line application (Click, Typer, ArgParse)
-        * List all available tasks
-        * Run an application (Flask, FastAPI, Django, etc.)
+    This is the program's entry point.
     """
-    print("This will do something")
+    parser = ArgumentParser(
+        prog='Test-Tool',
+        description='This programm is a tool for running tests.',
+        epilog='test-tool')
+    
+    parser.add_argument(
+        '-p',
+        '--project',
+        action='store',
+        help='The path to the project.',
+        default=getcwd()
+    )
+
+    parser.add_argument(
+        '-ca',
+        '--calls',
+        action='store',
+        help='The filename of the calls configuration.',
+        default='calls.yaml'
+    )
+
+    parser.add_argument(
+        '-d',
+        '--data',
+        action='store',
+        help='The filename of the data configuration.',
+        default='data.yaml'
+    )
+
+    parser.add_argument(
+        '-X',
+        '--debug',
+        action='store_true',
+        help='Activate debugging.'
+    )
+
+    args = parser.parse_args()
+
+    if args.debug:
+        basicConfig(level=DEBUG, format='%(asctime)s | %(levelname)s | %(message)s ')
+    else:
+        basicConfig(level=INFO, format='%(asctime)s | %(levelname)s | %(message)s ')
+
+    run_tests(args.project, args.calls, args.data)
