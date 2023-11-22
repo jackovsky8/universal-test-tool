@@ -41,10 +41,12 @@ jobs:
         uses: JackMcKew/pyinstaller-action-linux@main
         with:
           path: src
+      - run: ls -li
       - uses: actions/upload-artifact@v2
         with:
           name: test_tool
           path: src/dist/linux
+          if-no-files-found: error
           
   # tests_linux:
   #   needs: linter
