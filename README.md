@@ -2,6 +2,7 @@
 
 [![codecov](https://codecov.io/gh/jackovsky8/test-tool/branch/main/graph/badge.svg?token=test-tool_token_here)](https://codecov.io/gh/jackovsky8/test-tool)
 [![CI](https://github.com/jackovsky8/test-tool/actions/workflows/main.yml/badge.svg)](https://github.com/jackovsky8/test-tool/actions/workflows/main.yml)
+[![Package Application with Pyinstaller](https://github.com/jackovsky8/test-tool/actions/workflows/build.yaml/badge.svg)](https://github.com/jackovsky8/test-tool/actions/workflows/build.yaml)
 
 Awesome test-tool to make tests configurable with a yaml file.
 
