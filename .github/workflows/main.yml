@@ -39,11 +39,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: pip install --upgrade pip
+      - run: pip install docker-compose==1.24
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
           path: src
-      - run: pip install --upgrade pip
       - run: ls -li
       - run: cd dist && ls -li
       - run: cd dist && cd linux && ls -li
