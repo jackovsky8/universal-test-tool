@@ -8,4 +8,3 @@ python-dotenv
 paramiko
 JayDeBeApi
 requests
-bcrypt

@@ -38,9 +38,12 @@ jobs:
   build_for_linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install rustc
-      - run: pip install --upgrade pip
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Rust
+        run: sudo apt update && sudo apt install rustc
+      - name: Update pip
+        run: pip install --upgrade pip
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
@@ -48,7 +51,8 @@ jobs:
       - run: ls -li
       - run: cd dist && ls -li
       - run: cd dist && cd linux && ls -li
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: test_tool
           path: dist/linux
