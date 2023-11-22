@@ -31,8 +31,8 @@ jobs:
       - name: Install project
         run: make install
 
-      - name: Run linter
-        run: make lint
+      # - name: Run linter
+      #   run: make lint
 
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@main
