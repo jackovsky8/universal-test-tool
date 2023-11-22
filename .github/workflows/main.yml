@@ -33,7 +33,7 @@ jobs:
 
   build_linux:
     strategy:
-      fail-fast: false
+      fail-fast: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -43,10 +43,11 @@ jobs:
           path: src
       - run: ls -li
       - run: cd dist && ls -li
+      - run: cd dist && cd linux && ls -li
       - uses: actions/upload-artifact@v2
         with:
           name: test_tool
-          path: src/dist/linux
+          path: dist/linux
           if-no-files-found: error
           
   # tests_linux:
