@@ -40,7 +40,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: pip install --upgrade pip
-      - run: pip install docker-compose==1.24
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
