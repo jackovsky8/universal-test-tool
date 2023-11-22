@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Package Application Linux
-        uses: JackMcKew/pyinstaller-action-linux@main
+        uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
           path: src
       - run: ls -li
