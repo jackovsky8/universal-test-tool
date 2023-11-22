@@ -45,12 +45,13 @@ jobs:
         with:
           path: src
           spec: test-tool-linux.spec
-      - run: mv dist/linux/cli dist/linux/test-tool
+      - name: Rename Binary
+        run: mv dist/linux/cli dist/linux/test-tool
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: test-tool-linux
-          path: dist/linux/cli
+          path: dist/linux/test-tool
           if-no-files-found: error
 
   # build_for_windows:
