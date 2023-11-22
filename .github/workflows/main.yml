@@ -44,6 +44,8 @@ jobs:
         run: sudo apt update && sudo apt install docker-compose && sudo apt install rustc && rustc --version
       - name: Update pip
         run: pip install --upgrade pip
+      - name: Install BCrypt
+        run: pip install -U "bcrypt<4.0.0"
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
