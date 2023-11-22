@@ -18,27 +18,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.11]
+        python-version: [3.9, 3.10, 3.11]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Install project
         run: make install
-
       # - name: Run linter
       #   run: make lint
 
+  build_linux:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@main
         with:
           path: src
-
+      - uses: actions/upload-artifact@v2
+        with:
+          name: name-of-artifact
+          path: dist/linux
+          
   # tests_linux:
   #   needs: linter
   #   strategy:
