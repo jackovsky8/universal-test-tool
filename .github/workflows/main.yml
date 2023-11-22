@@ -40,24 +40,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install Rust
-        run: sudo apt update && sudo apt install docker-compose && sudo apt install rustc && rustc --version
-      - name: Update pip
-        run: pip install --upgrade pip
-      - name: Install BCrypt
-        run: pip install -U "bcrypt<4.0.0"
       - name: Package Application Linux
         uses: JackMcKew/pyinstaller-action-linux@python3.10
         with:
           path: src
           spec: test-tool-linux.spec
-      - run: ls -li
-      - run: cd dist && ls -li
-      - run: cd dist && cd linux && ls -li
+      - run: mv dist/linux/cli dist/linux/test-tool
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: test-tool
+          name: test-tool-linux
           path: dist/linux/cli
           if-no-files-found: error
 
