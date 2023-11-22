@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Rust
-        run: sudo apt update && sudo apt install rustc
+        run: sudo apt update && sudo apt install rustc && rustc --version
       - name: Update pip
         run: pip install --upgrade pip
       - name: Package Application Linux
