@@ -6,7 +6,7 @@ from paramiko import AutoAddPolicy, SSHClient
 from stat import S_ISDIR
 
 
-class CopyRemoteFilesCall():
+class CopyFilesSshCall():
     user: str
     password: str
     host: str
@@ -14,7 +14,7 @@ class CopyRemoteFilesCall():
     remote_path: Path
     download: bool
 
-default_copy_remote_files_call: CopyRemoteFilesCall = {
+default_copy_files_ssh_call: CopyFilesSshCall = {
     'user': '${REMOTE_CMD_USER}',
     'password': '${REMOTE_CMD_PASSWORD}',
     'host': '${REMOTE_CMD_HOST}',
@@ -104,11 +104,11 @@ def copy_remote_file(client: SSHClient, local_path: Path, remote_path: Path, dow
             else:
                 sftp.get(remote_path.as_posix(), local_path.joinpath(remote_path.name).as_posix())
 
-def make_copy_remote_files_call(call: CopyRemoteFilesCall, data: Dict[str, Any]) -> None:
+def make_copy_files_ssh_call(call: CopyFilesSshCall, data: Dict[str, Any]) -> None:
     # Run the cmd with client
     run_with_ssh_client(call['user'], call['host'], call['password'], lambda client: copy_remote_file(client, call["local_path"], call["remote_path"], call["download"]))
 
-def augment_copy_remote_files_call(call: CopyRemoteFilesCall, data: Dict, path: Path) -> None:
+def augment_copy_files_ssh_call(call: CopyFilesSshCall, data: Dict, path: Path) -> None:
     if call['local_path'] is not None:
         call['local_path'] = Path(call['local_path'])
 
@@ -118,5 +118,5 @@ def augment_copy_remote_files_call(call: CopyRemoteFilesCall, data: Dict, path: 
     if call['remote_path'] is not None:
         call['remote_path'] = Path(call['remote_path'])
                      
-
-
+def main() -> None:
+    print('test-tool-copy-files-ssh-plugin')

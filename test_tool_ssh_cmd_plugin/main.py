@@ -5,13 +5,13 @@ from typing import Any, Callable, Dict, List
 from paramiko import AutoAddPolicy, SSHClient
 
 
-class RemoteCmdCall():
+class SshCmdCall():
     user: str
     password: str
     host: str
     cmd: List[str]
 
-default_remote_cmd_call: RemoteCmdCall = {
+default_ssh_cmd_call: SshCmdCall = {
     'user': '${REMOTE_CMD_USER}',
     'password': '${REMOTE_CMD_PASSWORD}',
     'host': '${REMOTE_CMD_HOST}',
@@ -36,7 +36,7 @@ def run_with_ssh_client(user: str, host: str, password: str, callable: Callable[
         # Close the SSH connection
         client.close()
 
-def run_remote_cmd(client: SSHClient, cmd: str) -> None:
+def run_ssh_cmd(client: SSHClient, cmd: str) -> None:
     # Execute the command
     stdin, stdout, stderr = client.exec_command(cmd)
 
@@ -61,10 +61,13 @@ def run_remote_cmd(client: SSHClient, cmd: str) -> None:
     # TODO we could check other return codes as well
     assert return_code == 0
 
-def make_remote_cmd_call(call: RemoteCmdCall, data: Dict[str, Any]) -> None:
+def make_ssh_cmd_call(call: SshCmdCall, data: Dict[str, Any]) -> None:
     info(f'Run the cmd {call["cmd"]} remotely.')
     # Run the cmd with client
-    run_with_ssh_client(call['user'], call['host'], call['password'], lambda client: run_remote_cmd(client, call['cmd']))
+    run_with_ssh_client(call['user'], call['host'], call['password'], lambda client: run_ssh_cmd(client, call['cmd']))
 
-def augment_remote_cmd_call(call: RemoteCmdCall, data: Dict, path: Path) -> None:
+def augment_ssh_cmd_call(call: SshCmdCall, data: Dict, path: Path) -> None:
     pass
+
+def main() -> None:
+    print('test-tool-ssh-cmd-plugin')

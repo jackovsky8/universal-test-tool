@@ -182,3 +182,6 @@ def augment_rest_call(call: RestCall, data: Dict, path: Path) -> None:
 
     except KeyError:
         call['multipart'] = None
+
+def main() -> None:
+    print('test-tool-rest-plugin')

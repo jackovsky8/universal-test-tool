@@ -2,79 +2,100 @@
 test_tool base module.
 
 This is the principal module of the test_tool project.
-here you put your main classes and objects.
 """
 from copy import deepcopy
 from enum import Enum
 from importlib import import_module
 from logging import debug, error, info
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict
+from typing import Any, Dict, List, TypedDict, Callable
+from types import FunctionType
 
 from yaml import YAMLError, safe_load
 
-NAME = "test_tool"
 
+# Call Type
+class CallType(TypedDict):
+    default_call: Dict[str, Any]
+    augment_call: Callable
+    make_call: Callable
 
-class DynamicEnum:
-    def __init__(self, *enum_values):
-        for value in enum_values:
-            setattr(self, value, value)
+# Loaded Plugins
+LOADED_CALL_TYPES: Dict[str, CallType] = dict()
 
+# Call
+class Call(TypedDict):
+    type: str
+    call: Dict[str, Any]
 
-plugin_path: Path = Path(__file__).parent.parent.joinpath("plugins")
-plugin_files: List[Path] = plugin_path.glob("*_plugin.py")
-call_types: List[str] = [
-    file.name.replace("_plugin.py", "") for file in plugin_files
-]
+# Plugin Name Templates
+PLUGIN_NAME_TEMPLATE: str = "test_tool_${plugin}_plugin"
 
-CallType = Enum("CallType", [call_type.upper() for call_type in call_types])
-
-# Import all plugins
-components_from_plugin = [
+# Plugin Template
+PLUGIN_TEMPLATE: List[str] = [
     "default_${plugin}_call",
     "augment_${plugin}_call",
     "make_${plugin}_call",
 ]
 
-# Dynamically import the specified components from the module
-plugin_module = import_module("plugins")
-plugins: Dict[str, Any] = dict()
-for plugin in call_types:
-    components: List = [
-        component.replace("${plugin}", plugin)
-        for component in components_from_plugin
-    ]
-    imported_components = {
-        component.replace(f"{plugin}_", ""): getattr(plugin_module, component)
-        for component in components
-    }
-    plugins[CallType[plugin.upper()]] = imported_components
+PLUGIN_COMPONENT_TYPES: Dict[str, type] = {
+    "default_call": dict,
+    "augment_call": FunctionType,
+    "make_call": FunctionType,
+}
 
+def import_plugin(plugin: str) -> bool:
+    # Dynamically import the specified components from the module
+    try:
+        plugin_module = import_module(PLUGIN_NAME_TEMPLATE.replace("${plugin}", plugin.lower()))
+    except ModuleNotFoundError as e:
+        error(f"Plugin {plugin} not found, try to install it with pip install test_tool_{plugin.lower()}_plugin")
+        return False
 
-class Call(TypedDict):
-    type: CallType
-    call: Dict[str, Any]
+    # Create a dict for the loaded plugin
+    loaded_plugin: Dict[str, Any] = dict()
 
+    # Load the components from the plugin
+    to_load = [el.replace("${plugin}", plugin.lower()) for el in PLUGIN_TEMPLATE]
+    try:
+        for component in to_load:
+            key: str = component.replace(f"{plugin.lower()}_", "")
+            loaded_plugin[key] = getattr(plugin_module, component)
+            if type(loaded_plugin[key]) != PLUGIN_COMPONENT_TYPES[key]:
+                error(f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, {component} is not a {PLUGIN_COMPONENT_TYPES[key]}")
+                return False
+    except AttributeError as e:
+        error(f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, missing a component.")
+        return False
+
+    LOADED_CALL_TYPES[plugin] = loaded_plugin
+    return True
 
 def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
     errors = 0
 
     # Make the calls and check the response
     for idx, test in enumerate(calls):
-        # Determin the call type, default is REST
+        # Check if call type is defined
         try:
-            test["type"] = CallType[test["type"]]  # type: ignore
+            test["type"]
+        except KeyError:
+            debug("No call type defined, using default: REST")
+            test["type"] = "REST"
+
+        # Determine if the call type is loaded
+        try:
+            LOADED_CALL_TYPES[test["type"]]
         except KeyError as e:
-            if "'type'" == str(e):
-                test["type"] = CallType["REST"]
-            else:
+            # Module is not loaded yet, load it
+            debug(f"Loading plugin for call type {test['type']}")
+            if not import_plugin(test["type"]):
                 error(f'{test["type"]} call is not supported')
                 errors += 1
                 continue
 
         # Merge the default call with the call from the config
-        default_call = deepcopy(plugins[test["type"]]["default_call"])
+        default_call = deepcopy(LOADED_CALL_TYPES[test["type"]]["default_call"])
         try:
             call = {**default_call, **test["call"]}
         except KeyError as e:
@@ -101,12 +122,12 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
                         call[key] = value
 
         # Augment the call with the data from the config
-        plugins[test["type"]]["augment_call"](call, data, path)
+        LOADED_CALL_TYPES[test["type"]]["augment_call"](call, data, path)
 
         # Call the funktion
         try:
-            info(f'Make call {idx + 1} in {test["type"].name} plugin.')
-            plugins[test["type"]]["make_call"](call, data)
+            info(f'Make call {idx + 1} in {test["type"]} plugin.')
+            LOADED_CALL_TYPES[test["type"]]["make_call"](call, data)
             pass
         except AssertionError:
             errors += 1

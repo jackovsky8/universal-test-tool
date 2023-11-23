@@ -5,27 +5,27 @@ from typing import Any, Dict, List, Optional, TypedDict
 from jaydebeapi import connect
 
 
-class SqlSave(TypedDict):
+class JdbcSqlSave(TypedDict):
     row: int
     column: int
     name: str
 
-class SqlValidate(TypedDict):
+class JdbcSqlValidate(TypedDict):
     row: int
     column: int
     value: str
 
-class SqlCall():
+class JdbcSqlCall():
     query: str
-    save: Optional[SqlSave]
-    validate: Optional[SqlValidate]
+    save: Optional[JdbcSqlSave]
+    validate: Optional[JdbcSqlValidate]
     driver: str
     driver_path: str
     url: str
     username: str
     password: str
 
-default_sql_call: SqlCall = {
+default_jdbc_sql_call: JdbcSqlCall = {
     'query': None,
     'save': [],
     'validate': [],
@@ -36,7 +36,7 @@ default_sql_call: SqlCall = {
     'password': '${DB_PASSWORD}'
 }
 
-def make_sql_call(call: SqlCall, data: Dict[str, Any]) -> None:
+def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
     info(f'Run query: {call["query"]}')
                     
     # Establish the database connection
@@ -71,5 +71,8 @@ def make_sql_call(call: SqlCall, data: Dict[str, Any]) -> None:
                     error(f'Validate Object misses key {str(e)}')
                     assert False
 
-def augment_sql_call(call: SqlCall, data: Dict, path: Path) -> None:
+def augment_jdbc_sql_call(call: JdbcSqlCall, data: Dict, path: Path) -> None:
     pass
+
+def main() -> None:
+    print('test-tool-jdbc-sql-plugin')

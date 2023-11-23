@@ -8,20 +8,20 @@ from threading import Timer
 from typing import Any, Dict, List, TypedDict
 
 
-class LocalCmdSaveType(Enum):
+class BashCmdSaveType(Enum):
     JSON = 1
     STRING = 2
 
-class LocalCmdSave(TypedDict):
+class BashCmdSave(TypedDict):
     name: str
     type: str
 
-class LocalCmdCall():
+class BashCmdCall():
     cmd: List[str]
     timeout: float
-    save: LocalCmdSave
+    save: BashCmdSave
 
-default_local_cmd_call: LocalCmdCall = {
+default_bash_cmd_call: BashCmdCall = {
     'cmd': None,
     'timeout': None,
     'save': None
@@ -71,29 +71,32 @@ def run_cmd(command: List[str], timeout: float = None) -> str:
     
     return output.decode().strip().strip("'").strip('"')
 
-def make_local_cmd_call(call: LocalCmdCall, data: Dict[str, Any]) -> None:
+def make_bash_cmd_call(call: BashCmdCall, data: Dict[str, Any]) -> None:
     info(f'Run the cmd {" ".join(call["cmd"])}.')
     
     result = run_cmd(call['cmd'])
 
     if call['save'] is not None:
         try:
-            call['save']['type'] = LocalCmdSaveType[call['save']['type']]
+            call['save']['type'] = BashCmdSaveType[call['save']['type']]
         except KeyError as e:
             if "'type'" == str(e):
-                call['type'] = LocalCmdSaveType.STRING
+                call['type'] = BashCmdSaveType.STRING
             else:
                 error(f'Save type {str(e)} is not supported.')
 
-        if call['save']['type'] == LocalCmdSaveType.JSON:
+        if call['save']['type'] == BashCmdSaveType.JSON:
             val = loads(result.replace("'", '"'))
             for p in call['save']['path']:
                 val = val[p]
             debug(f'Save {val} as {call["save"]["name"]}')
             data[call['save']['name']] = val
-        elif call['save']['type'] == LocalCmdSaveType.STRING:
+        elif call['save']['type'] == BashCmdSaveType.STRING:
             debug(f'Save {result} as {call["save"]["name"]}')
             data[call['save']['name']] = result
 
-def augment_local_cmd_call(call: LocalCmdCall, data: Dict, path: Path) -> None:
+def augment_bash_cmd_call(call: BashCmdCall, data: Dict, path: Path) -> None:
     call['cmd'] = call["cmd"].split(' ')
+
+def main() -> None:
+    print('test-tool-bash-cmd-plugin')
