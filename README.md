@@ -70,6 +70,8 @@ Runs a command on the local machine.
         timeout: None
         save: None
 ```
+
+
 Object for save:
 ```yaml
 save:
@@ -83,6 +85,8 @@ save:
 |   cmd   |   None   |   The command to run.   |
 |   timeout   |   None   |   The timeout for the command.   |
 |   save   |   None   |   Save the result to value.   |
+
+
 Parameters for save:
 | Parameter | Default | Description |
 |:---------:|:--------:|:--------:|
