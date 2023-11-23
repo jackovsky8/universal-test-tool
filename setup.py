@@ -30,7 +30,7 @@ def read_requirements(path):
 
 
 setup(
-    name="test-tool",
+    name="universal-test-tool",
     version=read("test_tool", "VERSION"),
     description="Awesome test-tool to make tests configurable with a yaml file.",
     url="https://github.com/jackovsky8/test-tool/",
