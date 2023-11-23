@@ -6,6 +6,8 @@ Changelog
 ------------
 - Feat: Rename Package. [Jakob Graf]
 - Release: version 0.1.0 🚀 [Jakob Graf]
+- Feat: Rename Package. [Jakob Graf]
+- Release: version 0.1.0 🚀 [Jakob Graf]
 - Feat: Remove Pyinstaller. [Jakob Graf]
 - Feat: Make plugins lazy loadable. [Jakob Graf]
 - Aktualisieren von README.md. [Graf Jakob]
