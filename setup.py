@@ -32,8 +32,8 @@ def read_requirements(path):
 setup(
     name="universal-test-tool",
     version=read("test_tool", "VERSION"),
-    description="Awesome test-tool to make tests configurable with a yaml file.",
-    url="https://github.com/jackovsky8/test-tool/",
+    description="Awesome universal-test-tool to make tests configurable with a yaml file.",
+    url="https://github.com/jackovsky8/universal-test-tool/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author="jackovsky8",

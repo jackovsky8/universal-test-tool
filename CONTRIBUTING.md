@@ -8,9 +8,9 @@ This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
 ## Setting up your own fork of this repo.
 
 - On github interface click on `Fork` button.
-- Clone your fork of this repo. `git clone git@github.com:YOUR_GIT_USERNAME/test-tool.git`
-- Enter the directory `cd test-tool`
-- Add upstream repo `git remote add upstream https://github.com/jackovsky8/test-tool`
+- Clone your fork of this repo. `git clone git@github.com:YOUR_GIT_USERNAME/universal-test-tool.git`
+- Enter the directory `cd universal-test-tool`
+- Add upstream repo `git remote add upstream https://github.com/jackovsky8/universal-test-tool`
 
 ## Setting up your own virtual environment
 

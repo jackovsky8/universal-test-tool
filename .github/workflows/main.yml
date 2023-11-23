@@ -34,38 +34,6 @@ jobs:
         uses: codecov/codecov-action@v3
         env:
             CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  # build_for_linux:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2
-  #     - name: Package Application Linux
-  #       uses: JackMcKew/pyinstaller-action-linux@python3.10
-  #       with:
-  #         path: src
-  #         spec: test-tool-linux.spec
-  #     - name: Rename Binary
-  #       run: mv dist/linux/cli dist/linux/test-tool
-  #     - name: Upload Artifacts
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: test-tool-linux
-  #         path: dist/linux/test-tool
-  #         if-no-files-found: error
-
-  # build_for_windows:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Package Application Windows
-  #       uses: JackMcKew/pyinstaller-action-windows@main
-  #       with:
-  #         path: src
-  #     - uses: actions/upload-artifact@v2
-  #       with:
-  #         name: test_tool
-  #         path: dist/windows
           
   # tests_linux:
   #   needs: linter

@@ -1,9 +1,9 @@
-# test-tool
+# universal-test-tool
 
-[![codecov](https://codecov.io/gh/jackovsky8/test-tool/branch/main/graph/badge.svg?token=test-tool_token_here)](https://codecov.io/gh/jackovsky8/test-tool)
-[![CI](https://github.com/jackovsky8/test-tool/actions/workflows/main.yml/badge.svg)](https://github.com/jackovsky8/test-tool/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/jackovsky8/universal-test-tool/branch/main/graph/badge.svg?token=universal-test-tool_token_here)](https://codecov.io/gh/jackovsky8/universal-test-tool)
+[![CI](https://github.com/jackovsky8/universal-test-tool/actions/workflows/main.yml/badge.svg)](https://github.com/jackovsky8/universal-test-tool/actions/workflows/main.yml)
 
-Awesome test-tool to make tests configurable with a yaml file.
+Awesome universal-test-tool to make tests configurable with a yaml file.
 
 ## Run the tests
 
