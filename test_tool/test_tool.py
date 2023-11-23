@@ -17,7 +17,7 @@ def main():  # pragma: no cover
     parser = ArgumentParser(
         prog="Test-Tool",
         description="This programm is a tool for running tests.",
-        epilog="test-tool",
+        epilog="universal-test-tool Copyright (C) 2023 jackovsky8",
     )
 
     parser.add_argument(
