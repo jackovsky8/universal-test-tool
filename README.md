@@ -201,17 +201,25 @@ This project can handle other plugins as well. There just need to be a installed
 
 ```python
 # The default values of the plugin
-default_example_name_call: dict,
+default_example_name_call: Dict[str, Any] = {
+  'key1': 'value1',
+  'key2': 'value2'
+}
 
 # Change the values before the tests are run
 def augment_rest_call(call: Dict[Str, Str], data: Dict[Str, Any], path: Path) -> None:
   # Do your stuff here
-  # call is a merged object from default_example_name_call and the object from the calls.yaml file
-  # data is the data from the data.yaml file modified in test steps
+  # call is a merged object from default_example_name_call and the object from the calls.yaml file.
+  # data is the data from the data.yaml file modified in test steps.
+  # The path of the folder where the test is.
   pass
 
 # Make the call
-make_example_name_call: FunctionType
+def make_bash_cmd_call(call: BashCmdCall, data: Dict[str, Any]) -> None:
+  # Do your stuff here
+  # call is a merged object from default_example_name_call and the object from the calls.yaml file.
+  # data is the data from the data.yaml file modified in test steps.
+  pass
 ```
 
 In case of an error, there should be thrown an ```AssertionError```
