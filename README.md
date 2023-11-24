@@ -197,7 +197,17 @@ Runs a command on a remote machine via ssh.
 
 #### Other available plugins:
 
-This project can handle other plugins as well. There just need to be a installed module with the name test_tool_example_name_plugin with the following methods.
+This project can handle any other plugins as well. There just need to be a installed module with the naming following naming convention.
+E.g. if you define a test in the calls.yaml like:
+
+```yaml
+- type: EXAMPLE_CALL
+  call:
+    value1: Lorem
+    value2: Ipsum
+```
+
+This tool then searches for a plugin called test_tool_example_name_plugin with the following required methods:
 
 ```python
 # The default values of the plugin
@@ -222,9 +232,7 @@ def make_bash_cmd_call(call: BashCmdCall, data: Dict[str, Any]) -> None:
   pass
 ```
 
-In case of an error, there should be thrown an ```AssertionError```
-
-The test type is then ```EXAMPLE_NAME```
+If this module is found it is used to process the test case. In an case of an error, there should be thrown an ```AssertionError```.
 
 ## Development
 
