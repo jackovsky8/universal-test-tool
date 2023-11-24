@@ -204,7 +204,11 @@ This project can handle other plugins as well. There just need to be a installed
 default_example_name_call: dict,
 
 # Change the values before the tests are run
-augment_example_name_call: FunctionType
+def augment_rest_call(call: Dict[Str, Str], data: Dict[Str, Any], path: Path) -> None:
+  # Do your stuff here
+  # call is a merged object from default_example_name_call and the object from the calls.yaml file
+  # data is the data from the data.yaml file modified in test steps
+  pass
 
 # Make the call
 make_example_name_call: FunctionType
