@@ -42,12 +42,13 @@ setup(
     entry_points={
         "console_scripts": [
             "test-tool = test_tool.__main__:main",
+            "test-tool-assert-plugin = test_tool_assert_plugin.__main__:main",
             "test-tool-bash-cmd-plugin = test_tool_bash_cmd_plugin.__main__:main",
             "test-tool-copy-files-ssh-plugin = test_tool_copy_files_ssh_plugin.__main__:main",
             "test-tool-jdbc-sql-plugin = test_tool_jdbc_sql_plugin.__main__:main",
+            "test-tool-read-manifest-value-plugin = test_tool_read_manifest_value_plugin.__main__:main"
             "test-tool-rest-plugin = test_tool_rest_plugin.__main__:main",
             "test-tool-ssh-cmd-plugin = test_tool_ssh_cmd_plugin.__main__:main",
-            "test-tool-read-manifest-value-plugin = test_tool_read_manifest_value_plugin.__main__:main"
         ]
     },
     extras_require={"test": read_requirements("requirements-test.txt")},

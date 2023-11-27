@@ -33,12 +33,34 @@ Per default a file ```calls.yaml``` is searched in the project folder, which is 
 It is a list where every entry is one step to test.
 
 The tests are done in the following available plugins:
+- Assert (test_tool_assert_plugin)
 - Bash Cmd (test_tool_bash_cmd_plugin)
 - Copy Files SSH (test_tool_copy_files_ssh_plugin)
 - JDBC SQL (test_tool_jdbc_sql_plugin)
 - Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 - Rest (test_tool_rest_plugin)
 - SSH Cmd (test_tool_ssh_cmd_plugin)
+
+#### Assert (test_tool_assert_plugin)
+Make an assertion.
+
+##### Call:
+```yaml
+- type: ASSERT
+    call:
+        value: None
+        expected: None
+        operator: ==
+        error_msg: The value is not as expected.
+```
+
+##### Parameters:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   value   |   None   |   The given value.   |
+|   expected   |   None   |   The expected value.   |
+|   operator   |   ==   |   One of the supported operations (==, !=, <, <=, >, >=).   |
+|   error_msg   |   The value is not as expected.   |   The error message for the logs.   |
 
 #### Bash Cmd (test_tool_bash_cmd_plugin)
 Runs a command on the local machine.
@@ -232,7 +254,7 @@ Runs a command on a remote machine via ssh.
 
 #### Other available plugins:
 
-This project can handle any other plugins as well. There just need to be a installed module with the naming following naming convention.
+This project can handle any other plugins as well. There just need to be a installed module following a naming convention.
 E.g. if you define a test in the calls.yaml like:
 
 ```yaml
@@ -252,7 +274,7 @@ default_example_name_call: Dict[str, Any] = {
 }
 
 # Change the values before the tests are run
-def augment_rest_call(call: Dict[Str, Str], data: Dict[Str, Any], path: Path) -> None:
+def augment_example_name_call(call: Dict[str, Any], data: Dict[str, Any], path: Path) -> None:
   # Do your stuff here
   # call is a merged object from default_example_name_call and the object from the calls.yaml file.
   # data is the data from the data.yaml file modified in test steps.
@@ -260,7 +282,7 @@ def augment_rest_call(call: Dict[Str, Str], data: Dict[Str, Any], path: Path) ->
   pass
 
 # Make the call
-def make_bash_cmd_call(call: BashCmdCall, data: Dict[str, Any]) -> None:
+def make_example_name_call(call: Dict[str, Any], data: Dict[str, Any]) -> None:
   # Do your stuff here
   # call is a merged object from default_example_name_call and the object from the calls.yaml file.
   # data is the data from the data.yaml file modified in test steps.
