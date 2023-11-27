@@ -252,6 +252,7 @@ Runs a command on a remote machine via ssh.
         password: ${REMOTE_CMD_PASSWORD}
         host: ${REMOTE_CMD_HOST}
         cmd: None
+        return_code: None
 ```
 ##### Parameters:
 | Parameter | Default | Description |
@@ -260,6 +261,7 @@ Runs a command on a remote machine via ssh.
 |   password   |   ${REMOTE_CMD_PASSWORD}   |   The password for the ssh connection.   |
 |   host   |   ${REMOTE_CMD_HOST}   |   The host for the ssh connection.   |
 |   cmd   |   None   |   The command to run.   |
+|   return_code   |   None   |   The expected return code of the command 'cmd'.   |
 
 #### Other available plugins:
 

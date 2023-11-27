@@ -10,12 +10,14 @@ class SshCmdCall():
     password: str
     host: str
     cmd: List[str]
+    return_code: int
 
 default_ssh_cmd_call: SshCmdCall = {
     'user': '${REMOTE_CMD_USER}',
     'password': '${REMOTE_CMD_PASSWORD}',
     'host': '${REMOTE_CMD_HOST}',
-    'cmd': None
+    'cmd': None,
+    'return_code': None
 }
 
 def run_with_ssh_client(user: str, host: str, password: str, callable: Callable[[SSHClient], None]) -> None:
@@ -36,7 +38,7 @@ def run_with_ssh_client(user: str, host: str, password: str, callable: Callable[
         # Close the SSH connection
         client.close()
 
-def run_ssh_cmd(client: SSHClient, cmd: str) -> None:
+def run_ssh_cmd(client: SSHClient, cmd: str, expected_return_code: int) -> None:
     # Execute the command
     stdin, stdout, stderr = client.exec_command(cmd)
 
@@ -58,16 +60,17 @@ def run_ssh_cmd(client: SSHClient, cmd: str) -> None:
     if error_str:
         error(error_str.strip().strip("'").strip('"'))
                     
-    # TODO we could check other return codes as well
-    assert return_code == 0
+    if expected_return_code is not None:
+        assert return_code == expected_return_code
 
 def make_ssh_cmd_call(call: SshCmdCall, data: Dict[str, Any]) -> None:
     info(f'Run the cmd {call["cmd"]} remotely.')
     # Run the cmd with client
-    run_with_ssh_client(call['user'], call['host'], call['password'], lambda client: run_ssh_cmd(client, call['cmd']))
+    run_with_ssh_client(call['user'], call['host'], call['password'], lambda client: run_ssh_cmd(client, call['cmd'], call['return_code']))
 
 def augment_ssh_cmd_call(call: SshCmdCall, data: Dict, path: Path) -> None:
-    pass
+    if call['return_code'] is not None:
+        call['return_code'] = int(call['return_code'])
 
 def main() -> None:
     print('test-tool-ssh-cmd-plugin')
