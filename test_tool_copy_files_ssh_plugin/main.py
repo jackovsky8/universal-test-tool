@@ -97,7 +97,6 @@ def copy_remote_file(client: SSHClient, local_path: Path, remote_path: Path, dow
             # Create the local directory if it doesn't exist
             local_path.mkdir(parents=True, exist_ok=True)
 
-            attributes = sftp.listdir_attr(remote_path.as_posix())
             # Copy the file
             if S_ISDIR(sftp.stat(remote_path.as_posix()).st_mode):
                 download_directory(remote_path, local_path, sftp)
