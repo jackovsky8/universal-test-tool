@@ -4,6 +4,13 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: ssh command accept different return codes. [Jakob Graf]
+- Feat: improve and rename bash cmd plugin. [Jakob Graf]
+
+
+0.1.2 (2023-11-27)
+------------------
+- Release: version 0.1.2 🚀 [Jakob Graf]
 - Bug: setup. [Jakob Graf]
 - Feat: assert plugin. [Jakob Graf]
 - Feat: read jar manifest. [Jakob Graf]
