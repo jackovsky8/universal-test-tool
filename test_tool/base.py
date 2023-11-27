@@ -71,6 +71,58 @@ def import_plugin(plugin: str) -> bool:
     LOADED_CALL_TYPES[plugin] = loaded_plugin
     return True
 
+def replace_string_variables(to_change : str, data: Dict[str, Any]) -> str:
+    changed: str = to_change
+    for var, val in data.items():
+        # We only want to replace with strings
+        if type(val) is not str:
+            continue
+
+        # The string we want to search for
+        origin: str = "${" + var + "}"
+
+        # Check if the string contains the origin
+        changed = changed.replace(origin, val)
+
+    if changed != to_change:
+        debug(f"Changed value {to_change} to {changed}.")
+        return changed
+    
+    return None
+
+def recursively_replace_variables(to_change : Dict[str, Any], data: Dict[str, Any]) -> None:
+    for key, value in to_change.items():
+        debug(f"{key}: {value}")
+        changed: bool = False
+        changed_iteration: bool = True
+        while changed_iteration:
+            changed_iteration = False
+            if type(to_change[key]) is dict:
+                changed_iteration = recursively_replace_variables(value, data)
+            elif type(to_change[key]) is list:
+                for idx, val in enumerate(to_change[key]):
+                    if type(val) is dict:
+                        new_val = recursively_replace_variables(val, data)
+                        if new_val:
+                            changed_iteration = True
+                            to_change[key][idx] = new_val
+                    elif type(val) is str:
+                        new_value = replace_string_variables(to_change[key], data)
+                        if new_value:
+                            changed_iteration = True
+                            to_change[key][idx] = new_val
+            elif type(to_change[key]) is str:
+                new_value = replace_string_variables(to_change[key], data)
+                if new_value:
+                    changed_iteration = True
+                    to_change[key] = new_value
+
+        if changed_iteration:
+            changed = True
+
+    if changed:
+        return to_change
+
 def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
     errors = 0
 
@@ -106,20 +158,8 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
                 errors += 1
                 continue
 
-        # Replace variables in call with data
-        for key, value in call.items():
-            debug(f"{key}: {value}")
-            changed: bool = True
-            while changed:
-                changed = False
-                if type(value) is str:
-                    for var, val in data.items():
-                        origin: str = "${" + var + "}"
-                        changed = changed or (value.find(origin) >= 0)
-                        value = value.replace(origin, val)
-                    if changed:
-                        debug(f"Changed value {key} to: {value}")
-                        call[key] = value
+        # Recursivly replace variables in call with data
+        recursively_replace_variables(call, data)
 
         # Augment the call with the data from the config
         LOADED_CALL_TYPES[test["type"]]["augment_call"](call, data, path)
