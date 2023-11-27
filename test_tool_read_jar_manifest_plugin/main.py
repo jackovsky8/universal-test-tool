@@ -6,7 +6,7 @@ from zipfile import ZipFile
 
 class SaveValue(TypedDict):
     name: str
-    value: Optional[str]
+    key: Optional[str]
 
 class ReadJarManifestCall(TypedDict):
     jar_path: Path
@@ -39,8 +39,8 @@ def make_read_jar_manifest_call(call: ReadJarManifestCall, data: Dict[str, Any])
 
     # Save specific attributes from the manifest
     for save in call['save']:
-        if save['value'] in manifest:
-            data[save['name']] = manifest[save['value']]
+        if save['key'] in manifest:
+            data[save['name']] = manifest[save['key']]
 
             debug(f'Saving {save["name"]}={data[save["name"]]}')
         else:
@@ -54,4 +54,4 @@ def augment_read_jar_manifest_call(call: ReadJarManifestCall, data: Dict, path: 
         call['jar_path'] = path.joinpath(call['jar_path'])
                      
 def main() -> None:
-    print('test-tool-read-manifest-value-plugin')
+    print('test-tool-read-jar-manifest-plugin')

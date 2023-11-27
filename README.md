@@ -36,6 +36,7 @@ The tests are done in the following available plugins:
 - Bash Cmd (test_tool_bash_cmd_plugin)
 - Copy Files SSH (test_tool_copy_files_ssh_plugin)
 - JDBC SQL (test_tool_jdbc_sql_plugin)
+- Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 - Rest (test_tool_rest_plugin)
 - SSH Cmd (test_tool_ssh_cmd_plugin)
 
@@ -138,6 +139,40 @@ save:
 |   url   |   ${DB_URL}   |   The jdbc connection string   |
 |   username   |   ${DB_USERNAME}   |   The username of the db   |
 |   password   |   ${DB_PASSWORD}   |   The password of the db   |
+
+#### Read Jar Manifest (test_tool_read_jar_manifest_plugin)
+Unpacks a jar file and parses and prints the manifest file to the logger. It also optionally saves a value.
+
+##### Call:
+```yaml
+- type: READ_JAR_MANIFEST
+    call:
+        jar_path: ${PATH_JAR_FILE}
+        manifest_path: META-INF/MANIFEST.MF
+        save: []
+```
+
+
+Object for save:
+```yaml
+save:
+    name: None
+    key: None
+```
+
+##### Parameters:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   jar_path   |   ${PATH_JAR_FILE}   |   The absolute or relative path to the jar file.   |
+|   manifest_path   |   META-INF/MANIFEST.MF   |   The path within the jar file to the manifest.   |
+|   save   |   None   |   Save values of the result to a variable with the given name.   |
+
+
+Parameters for save:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   name   |   None   |   The name for the variable to save the result in.   |
+|   key   |   None   |   The key of the parsed manifest.   |
 
 #### Rest (test_tool_rest_plugin)
 Tests REST endpoints.
