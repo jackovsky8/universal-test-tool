@@ -34,11 +34,11 @@ It is a list where every entry is one step to test.
 
 The tests are done in the following available plugins:
 - Assert (test_tool_assert_plugin)
-- Bash Cmd (test_tool_bash_cmd_plugin)
 - Copy Files SSH (test_tool_copy_files_ssh_plugin)
 - JDBC SQL (test_tool_jdbc_sql_plugin)
 - Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 - Rest (test_tool_rest_plugin)
+- Run Process (test_tool_run_process_plugin)
 - SSH Cmd (test_tool_ssh_cmd_plugin)
 
 #### Assert (test_tool_assert_plugin)
@@ -61,40 +61,6 @@ Make an assertion.
 |   expected   |   None   |   The expected value.   |
 |   operator   |   ==   |   One of the supported operations (==, !=, <, <=, >, >=).   |
 |   error_msg   |   The value is not as expected.   |   The error message for the logs.   |
-
-#### Bash Cmd (test_tool_bash_cmd_plugin)
-Runs a command on the local machine.
-
-##### Call:
-```yaml
-- type: BASH_CMD
-    call:
-        cmd: None
-        timeout: None
-        save: None
-```
-
-
-Object for save:
-```yaml
-save:
-    name: None
-    type: None
-```
-
-##### Parameters:
-| Parameter | Default | Description |
-|:---------:|:--------:|:--------:|
-|   cmd   |   None   |   The command to run.   |
-|   timeout   |   None   |   The timeout for the command.   |
-|   save   |   None   |   Save the result to value.   |
-
-
-Parameters for save:
-| Parameter | Default | Description |
-|:---------:|:--------:|:--------:|
-|   name   |   None   |   The name for the variable to save the result in.   |
-|   type   |   None   |   The type for how to treat the result (STRING, JSON).   |
 
 #### Copy Files SSH (test_tool_copy_files_ssh_plugin)
 Copies files and folders between local machine and remote machine via ssh.
@@ -231,6 +197,49 @@ Tests REST endpoints.
 |   assertion   |   NONE   |   The assertion how the response should look like   |
 |   hide_log   |   False   |   Don't print the reply in the logs.   |
 |   status_codes   |   [200]   |   The status codes to accept.   |
+
+
+#### Run Process (test_tool_run_process_plugin)
+Start a subprocess on the local machine.
+
+##### Call:
+```yaml
+- type: RUN_PROCESS
+    call:
+        cmd: None
+        timeout: None
+        save: None
+        shell: True
+        text: True
+        program: '/bin/bash'
+        return_code: None
+```
+
+
+Object for save:
+```yaml
+save:
+    name: None
+    type: None
+```
+
+##### Parameters:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   cmd   |   None   |   The command to run.   |
+|   timeout   |   None   |   The timeout for the command.   |
+|   save   |   None   |   Save the result to value.   |
+|   text   |   True   |   Interpret the in/output as text.   |
+|   shell   |   True   |   Run the program in a shell.   |
+|   program   |   /bin/bash   |   The program to run the command with ('/bin/bash', '/bin/sh', '/bin/zsh').   |
+|   return_code   |   None   |   The expected return code of the command 'cmd'.   |
+
+
+Parameters for save:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   name   |   None   |   The name for the variable to save the result in.   |
+|   type   |   None   |   The type for how to treat the result (STRING, JSON).   |
 
 #### SSH Cmd (test_tool_ssh_cmd_plugin)
 Runs a command on a remote machine via ssh.
