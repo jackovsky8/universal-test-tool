@@ -39,6 +39,7 @@ The tests are done in the following available plugins:
 - Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 - Rest (test_tool_rest_plugin)
 - Run Process (test_tool_run_process_plugin)
+- Selenium (test_tool_selenium_plugin)
 - SSH Cmd (test_tool_ssh_cmd_plugin)
 
 #### Assert (test_tool_assert_plugin)
@@ -187,7 +188,7 @@ Tests REST endpoints.
 |:---------:|:--------:|:--------:|
 |   base_url   |   ${REST_BASE_URL}   |   The base url of the service to test.   |
 |   path   |   ${REST_PATH}   |   The path of the endpoint to test.   |
-|   url   |  None   |   The url value is built dynamically from ${base_url}/${path} if not set. Otherwiese the oder values are ignored.   |
+|   url   |  None   |   The url value is built dynamically from ${base_url}/${path} if not set. Otherwiese the other values are ignored.   |
 |   method   |   GET   |   The method of the call. (GET, POST, DELETE, PUT)   |
 |   data   |   None   |   The data of the http call, an object is used as json.   |
 |   files   |   None   |   Path of files to send.   |
@@ -240,6 +241,49 @@ Parameters for save:
 |:---------:|:--------:|:--------:|
 |   name   |   None   |   The name for the variable to save the result in.   |
 |   type   |   None   |   The type for how to treat the result (STRING, JSON).   |
+
+
+#### Selenium (test_tool_selenium_plugin)
+Start a webbrowser and run tests via [selenium](https://selenium-python.readthedocs.io/).
+
+##### Call:
+```yaml
+- type: SELENIUM
+    call:
+        actions: []
+        base_url: '${GUI_BASE_URL}',
+        path: '${GUI_PATH}',
+        url: None,
+        webdriver: ['chrome']
+```
+
+
+Object for action:
+```yaml
+action: None
+args: None
+actions: None
+log: None
+```
+
+##### Parameters:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   actions   |   None   |   The actions to run on the website.   |
+|   base_url   |   ${REST_BASE_URL}   |   The base url of the website to test.   |
+|   path   |   ${REST_PATH}   |   The path of the website to test.   |
+|   url   |  None   |   The url value is built dynamically from ${base_url}/${path} if not set. Otherwiese the other values are ignored.   |
+|   webdriver   |   True   |   A list of webdrivers to test with [chrome, gecko, chromium-edge].   |
+
+
+Parameters for action:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   action   |   None   |   The action to run on the driver/element.   |
+|   args   |   None   |   The arguments for the action.   |
+|   actions   |   None   |   Followup actions.   |
+|   log   |   None   |   A log to print if the action is started.   |
+
 
 #### SSH Cmd (test_tool_ssh_cmd_plugin)
 Runs a command on a remote machine via ssh.

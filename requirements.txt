@@ -8,3 +8,5 @@ python-dotenv
 paramiko
 JayDeBeApi
 requests
+selenium
+webdriver_manager

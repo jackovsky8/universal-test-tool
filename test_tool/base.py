@@ -6,7 +6,7 @@ This is the principal module of the test_tool project.
 from copy import deepcopy
 from enum import Enum
 from importlib import import_module
-from logging import debug, error, info
+from logging import debug, error, info, exception
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, Callable
 from types import FunctionType
@@ -91,6 +91,7 @@ def replace_string_variables(to_change : str, data: Dict[str, Any]) -> str:
     return None
 
 def recursively_replace_variables(to_change : Dict[str, Any], data: Dict[str, Any]) -> None:
+    changed: bool = False
     for key, value in to_change.items():
         debug(f"{key}: {value}")
         changed: bool = False
@@ -107,7 +108,7 @@ def recursively_replace_variables(to_change : Dict[str, Any], data: Dict[str, An
                             changed_iteration = True
                             to_change[key][idx] = new_val
                     elif type(val) is str:
-                        new_value = replace_string_variables(to_change[key], data)
+                        new_value = replace_string_variables(val, data)
                         if new_value:
                             changed_iteration = True
                             to_change[key][idx] = new_val
@@ -169,7 +170,11 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
             info(f'Make call {idx + 1} in {test["type"]} plugin.')
             LOADED_CALL_TYPES[test["type"]]["make_call"](call, data)
             pass
-        except AssertionError:
+        except AssertionError as e:
+            error(f"Assertion failed: {e}")
+            errors += 1
+        except Exception as e:
+            exception(f"Exception occured (This might b a problem with the plugin or config): {e}")
             errors += 1
 
     return errors
@@ -201,6 +206,9 @@ def run_tests(
         data = {}
     for key, value in data.items():
         debug(f"Loaded {value} for {key}")
+
+    # Set the project path in the data
+    data["PROJECT_PATH"] = project_path.as_posix()
 
     # Load the calls
     calls = load_config_yaml(calls_path)

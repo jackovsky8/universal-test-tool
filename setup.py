@@ -43,11 +43,12 @@ setup(
         "console_scripts": [
             "test-tool = test_tool.__main__:main",
             "test-tool-assert-plugin = test_tool_assert_plugin.__main__:main",
-            "test-tool-bash-cmd-plugin = test_tool_bash_cmd_plugin.__main__:main",
             "test-tool-copy-files-ssh-plugin = test_tool_copy_files_ssh_plugin.__main__:main",
             "test-tool-jdbc-sql-plugin = test_tool_jdbc_sql_plugin.__main__:main",
             "test-tool-read-jar-manifest-plugin = test_tool_read_jar_manifest_plugin.__main__:main",
             "test-tool-rest-plugin = test_tool_rest_plugin.__main__:main",
+            "test-tool-run-process-plugin = test_tool_run_process_plugin.__main__:main",
+            "test-tool-selenium-plugin = test_tool_selenium_plugin.__main__:main",
             "test-tool-ssh-cmd-plugin = test_tool_ssh_cmd_plugin.__main__:main",
         ]
     },
