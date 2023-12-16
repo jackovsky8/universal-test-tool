@@ -4,6 +4,29 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: selenium plugin. [Jakob Graf]
+- Merge pull request #3 from
+  jackovsky8/dependabot/github_actions/actions/setup-python-5. [Graf
+  Jakob]
+
+  build(deps): bump actions/setup-python from 4 to 5
+- Build(deps): bump actions/setup-python from 4 to 5. [dependabot[bot]]
+
+  Bumps [actions/setup-python](https://github.com/actions/setup-python) from 4 to 5.
+  - [Release notes](https://github.com/actions/setup-python/releases)
+  - [Commits](https://github.com/actions/setup-python/compare/v4...v5)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/setup-python
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+0.1.3 (2023-11-27)
+------------------
+- Release: version 0.1.3 🚀 [Jakob Graf]
 - Feat: ssh command accept different return codes. [Jakob Graf]
 - Feat: improve and rename bash cmd plugin. [Jakob Graf]
 
