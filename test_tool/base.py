@@ -4,7 +4,6 @@ test_tool base module.
 This is the principal module of the test_tool project.
 """
 from copy import deepcopy
-from enum import Enum
 from importlib import import_module
 from logging import debug, error, info, exception
 from pathlib import Path
@@ -14,19 +13,26 @@ from types import FunctionType
 from yaml import YAMLError, safe_load
 
 
-# Call Type
 class CallType(TypedDict):
+    """
+    Call Type.
+    """
     default_call: Dict[str, Any]
     augment_call: Callable
     make_call: Callable
 
+
 # Loaded Plugins
 LOADED_CALL_TYPES: Dict[str, CallType] = dict()
 
-# Call
+
 class Call(TypedDict):
+    """
+    Call.
+    """
     type: str
     call: Dict[str, Any]
+
 
 # Plugin Name Templates
 PLUGIN_NAME_TEMPLATE: str = "test_tool_${plugin}_plugin"
@@ -44,38 +50,72 @@ PLUGIN_COMPONENT_TYPES: Dict[str, type] = {
     "make_call": FunctionType,
 }
 
+
 def import_plugin(plugin: str) -> bool:
-    # Dynamically import the specified components from the module
+    """
+    Dynamically import the specified components from the module
+
+    Parameters
+    ----------
+    plugin : str
+        Name of the plugin.
+
+    Returns
+    -------
+    bool
+        True if the plugin was loaded successfully, False otherwise.
+    """
     try:
-        plugin_module = import_module(PLUGIN_NAME_TEMPLATE.replace("${plugin}", plugin.lower()))
-    except ModuleNotFoundError as e:
-        error(f"Plugin {plugin} not found, try to install it with pip install test_tool_{plugin.lower()}_plugin")
+        plugin_module = import_module(
+            PLUGIN_NAME_TEMPLATE.replace("${plugin}", plugin.lower()))
+    except ModuleNotFoundError:
+        error(
+            f"Plugin {plugin} not found, try to install it with pip install test_tool_{plugin.lower()}_plugin")
         return False
 
     # Create a dict for the loaded plugin
     loaded_plugin: Dict[str, Any] = dict()
 
     # Load the components from the plugin
-    to_load = [el.replace("${plugin}", plugin.lower()) for el in PLUGIN_TEMPLATE]
+    to_load = [el.replace("${plugin}", plugin.lower())
+               for el in PLUGIN_TEMPLATE]
     try:
         for component in to_load:
             key: str = component.replace(f"{plugin.lower()}_", "")
             loaded_plugin[key] = getattr(plugin_module, component)
-            if type(loaded_plugin[key]) != PLUGIN_COMPONENT_TYPES[key]:
-                error(f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, {component} is not a {PLUGIN_COMPONENT_TYPES[key]}")
+            if not isinstance(loaded_plugin[key], PLUGIN_COMPONENT_TYPES[key]):
+                error(
+                    f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, {component} is not a {PLUGIN_COMPONENT_TYPES[key]}")
                 return False
-    except AttributeError as e:
-        error(f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, missing a component.")
+    except AttributeError:
+        error(
+            f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, missing a component.")
         return False
 
     LOADED_CALL_TYPES[plugin] = loaded_plugin
     return True
 
-def replace_string_variables(to_change : str, data: Dict[str, Any]) -> str:
+
+def replace_string_variables(to_change: str, data: Dict[str, Any]) -> str:
+    """
+    Replace variables in a string.
+
+    Parameters
+    ----------
+    to_change : str
+        String to change.
+    data : Dict[str, Any]
+        Data to use for the changes.
+
+    Returns
+    -------
+    str
+        The changed string.
+    """
     changed: str = to_change
     for var, val in data.items():
         # We only want to replace with strings
-        if type(val) is not str:
+        if not isinstance(val, str):
             continue
 
         # The string we want to search for
@@ -87,10 +127,25 @@ def replace_string_variables(to_change : str, data: Dict[str, Any]) -> str:
     if changed != to_change:
         debug(f"Changed value {to_change} to {changed}.")
         return changed
-    
+
     return None
 
-def recursively_replace_variables(to_change : Dict[str, Any], data: Dict[str, Any]) -> None:
+
+def recursively_replace_variables(to_change: Dict[str, Any], data: Dict[str, Any]) -> None:
+    """
+    Recursively replace variables in a dict.
+
+    Parameters
+    ----------
+    to_change : Dict[str, Any]
+        Dict to change.
+    data : Dict[str, Any]
+        Data to use for the changes.
+
+    Returns
+    -------
+    None
+    """
     changed: bool = False
     for key, value in to_change.items():
         debug(f"{key}: {value}")
@@ -98,21 +153,21 @@ def recursively_replace_variables(to_change : Dict[str, Any], data: Dict[str, An
         changed_iteration: bool = True
         while changed_iteration:
             changed_iteration = False
-            if type(to_change[key]) is dict:
+            if isinstance(to_change[key], dict):
                 changed_iteration = recursively_replace_variables(value, data)
-            elif type(to_change[key]) is list:
+            elif isinstance(to_change[key], list):
                 for idx, val in enumerate(to_change[key]):
-                    if type(val) is dict:
+                    if isinstance(val, dict):
                         new_val = recursively_replace_variables(val, data)
                         if new_val:
                             changed_iteration = True
                             to_change[key][idx] = new_val
-                    elif type(val) is str:
+                    elif isinstance(val, str):
                         new_value = replace_string_variables(val, data)
                         if new_value:
                             changed_iteration = True
                             to_change[key][idx] = new_val
-            elif type(to_change[key]) is str:
+            elif isinstance(to_change[key], str):
                 new_value = replace_string_variables(to_change[key], data)
                 if new_value:
                     changed_iteration = True
@@ -124,7 +179,25 @@ def recursively_replace_variables(to_change : Dict[str, Any], data: Dict[str, An
     if changed:
         return to_change
 
+
 def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
+    """
+    Make all calls.
+
+    Parameters
+    ----------
+    calls : List[Call]
+        List of calls.
+    data : Dict[str, Any]
+        Data to use for the calls.
+    path : Path
+        Path to the project.
+
+    Returns
+    -------
+    int
+        Number of errors.
+    """
     errors = 0
 
     # Make the calls and check the response
@@ -139,7 +212,7 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
         # Determine if the call type is loaded
         try:
             LOADED_CALL_TYPES[test["type"]]
-        except KeyError as e:
+        except KeyError:
             # Module is not loaded yet, load it
             debug(f"Loading plugin for call type {test['type']}")
             if not import_plugin(test["type"]):
@@ -148,7 +221,8 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
                 continue
 
         # Merge the default call with the call from the config
-        default_call = deepcopy(LOADED_CALL_TYPES[test["type"]]["default_call"])
+        default_call = deepcopy(
+            LOADED_CALL_TYPES[test["type"]]["default_call"])
         try:
             call = {**default_call, **test["call"]}
         except KeyError as e:
@@ -169,19 +243,32 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
         try:
             info(f'Make call {idx + 1} in {test["type"]} plugin.')
             LOADED_CALL_TYPES[test["type"]]["make_call"](call, data)
-            pass
         except AssertionError as e:
             error(f"Assertion failed: {e}")
             errors += 1
         except Exception as e:
-            exception(f"Exception occured (This might b a problem with the plugin or config): {e}")
+            exception(
+                f"Exception occured (This might b a problem with the plugin or config): {e}")
             errors += 1
 
     return errors
 
 
-def load_config_yaml(config: Path):
-    with open(config, "r") as stream:
+def load_config_yaml(config: Path) -> Dict[str, Any]:
+    """
+    Load a yaml config file.
+
+    Parameters
+    ----------
+    config : Path
+        Path to the config file.
+
+    Returns
+    -------
+    Dict[str, Any]
+        The loaded config.
+    """
+    with open(config, "r", encoding="utf-8") as stream:
         try:
             return safe_load(stream)
         except YAMLError as exc:
@@ -192,6 +279,22 @@ def load_config_yaml(config: Path):
 def run_tests(
     project_path_str: str, calls_path_str: str, data_path_str: str
 ) -> None:
+    """
+    Run the tests.
+
+    Parameters
+    ----------
+    project_path_str : str
+        Path to the project.
+    calls_path_str : str
+        Path to the calls config.
+    data_path_str : str
+        Path to the data config.
+
+    Returns
+    -------
+    None
+    """
     project_path: Path = Path(project_path_str)
     calls_path: Path = project_path.joinpath(calls_path_str)
     data_path: Path = project_path.joinpath(data_path_str)
@@ -215,10 +318,8 @@ def run_tests(
     errors = make_all_calls(calls, data, project_path)
 
     if errors == 0:
-        info("Everything OK")
+        info('Everything OK')
     else:
         error(
-            "There occured {} errors while testing, please check the logs".format(
-                errors
-            )
+            f'There occured {errors} errors while testing, please check the logs'
         )
