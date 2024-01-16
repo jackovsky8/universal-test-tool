@@ -114,9 +114,8 @@ def replace_string_variables(to_change: str, data: Dict[str, Any]) -> str:
     """
     changed: str = to_change
     for var, val in data.items():
-        # We only want to replace with strings
-        if not isinstance(val, str):
-            continue
+        # cast to string since we want to replace strings
+        val = str(val)
 
         # The string we want to search for
         origin: str = "${" + var + "}"
