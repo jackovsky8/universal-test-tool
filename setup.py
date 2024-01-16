@@ -50,6 +50,7 @@ setup(
             "test-tool-run-process-plugin = test_tool_run_process_plugin.__main__:main",
             "test-tool-selenium-plugin = test_tool_selenium_plugin.__main__:main",
             "test-tool-ssh-cmd-plugin = test_tool_ssh_cmd_plugin.__main__:main",
+            "test-tool-sql-plus-plugin = test_tool_sql_plus_plugin.__main__:main",
         ]
     },
     extras_require={"test": read_requirements("requirements-test.txt")},
