@@ -4,6 +4,13 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: ssh cmd assertion. [Jakob Graf]
+- Feat: fail fast. [Jakob Graf]
+
+
+0.1.5 (2024-01-16)
+------------------
+- Release: version 0.1.5 🚀 [Jakob Graf]
 - Bug: code formatting. [Jakob Graf]
 - Bug: variable replacement. [Jakob Graf]
 - Feat: create sql plus plugin. [Jakob Graf]
