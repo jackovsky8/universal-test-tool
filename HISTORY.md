@@ -4,6 +4,18 @@ Changelog
 
 (unreleased)
 ------------
+- Bug: code formatting. [Jakob Graf]
+- Bug: variable replacement. [Jakob Graf]
+- Feat: create sql plus plugin. [Jakob Graf]
+- Feat: cleanup code. [Jakob Graf]
+- Aktualisieren von README.md. [Graf Jakob]
+- Aktualisieren von README.md. [Graf Jakob]
+- Aktualisieren von README.md. [Graf Jakob]
+
+
+0.1.4 (2023-12-16)
+------------------
+- Release: version 0.1.4 🚀 [Jakob Graf]
 - Feat: selenium plugin. [Jakob Graf]
 - Merge pull request #3 from
   jackovsky8/dependabot/github_actions/actions/setup-python-5. [Graf
