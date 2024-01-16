@@ -1,4 +1,7 @@
-"""CLI interface for test_tool project.
+"""
+CLI interface for test_tool project.
+
+It is executed when the program is called from the command line.
 """
 from argparse import ArgumentParser
 from logging import DEBUG, INFO, basicConfig
@@ -7,7 +10,7 @@ from os import getcwd
 from test_tool.base import run_tests
 
 
-def main():  # pragma: no cover
+def main() -> None:  # pragma: no cover
     """
     The main function executes on commands:
     `python -m test_tool` and `$ test_tool `.
@@ -45,32 +48,38 @@ def main():  # pragma: no cover
     )
 
     parser.add_argument(
-        "-f",
-        "--fail-fast",
+        "-c",
+        "--continue_tests",
         action="store_true",
-        help="Stop on first error.",
+        help="Continue the tests even if one fails.",
         default=False,
     )
 
     parser.add_argument(
-        "-X",
-        "--debug",
-        action="store_true",
-        help="Activate debugging."
+        "-o",
+        "--output",
+        action="store",
+        help="Create a folder with the logs of the tests.",
+        default="runs/%Y%m%d_%H%M%S",
+    )
+
+    parser.add_argument(
+        "-X", "--debug", action="store_true", help="Activate debugging."
     )
 
     args = parser.parse_args()
 
-    if args.debug:
-        basicConfig(
-            level=DEBUG, format="%(asctime)s | %(levelname)s | %(message)s "
-        )
-    else:
-        basicConfig(
-            level=INFO, format="%(asctime)s | %(levelname)s | %(message)s "
-        )
+    log_format: str = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    log_level = INFO
 
-    run_tests(args.project, args.calls, args.data, args.fail_fast)
+    if args.debug:
+        log_level = DEBUG
+    basicConfig(level=log_level, format=log_format)
+
+    run_tests(
+        args.project, args.calls, args.data, args.continue_tests, args.output
+    )
+
 
 if __name__ == "__main__":  # pragma: no cover
     main()
