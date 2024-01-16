@@ -5,10 +5,11 @@ This is the principal module of the test_tool project.
 """
 from copy import deepcopy
 from importlib import import_module
-from logging import debug, error, info, exception
+from logging import debug, error, info, getLogger, DEBUG
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, Callable
 from types import FunctionType
+from traceback import print_exception
 
 from yaml import YAMLError, safe_load
 
@@ -179,7 +180,7 @@ def recursively_replace_variables(to_change: Dict[str, Any], data: Dict[str, Any
         return to_change
 
 
-def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
+def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path, fail_fast) -> int:
     """
     Make all calls.
 
@@ -191,6 +192,8 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
         Data to use for the calls.
     path : Path
         Path to the project.
+    fail_fast : bool
+        Fail fast.
 
     Returns
     -------
@@ -246,9 +249,16 @@ def make_all_calls(calls: List[Call], data: Dict[str, Any], path: Path) -> int:
             error(f"Assertion failed: {e}")
             errors += 1
         except Exception as e:
-            exception(
+            error(
                 f"Exception occured (This might b a problem with the plugin or config): {e}")
+            # if debug:
+            if getLogger().getEffectiveLevel() == DEBUG:
+                print_exception(type(e), e, e.__traceback__)
             errors += 1
+
+        if errors > 0 and fail_fast:
+            error("Stopping on first error")
+            break
 
     return errors
 
@@ -276,7 +286,7 @@ def load_config_yaml(config: Path) -> Dict[str, Any]:
 
 
 def run_tests(
-    project_path_str: str, calls_path_str: str, data_path_str: str
+    project_path_str: str, calls_path_str: str, data_path_str: str, fail_fast: bool
 ) -> None:
     """
     Run the tests.
@@ -289,6 +299,8 @@ def run_tests(
         Path to the calls config.
     data_path_str : str
         Path to the data config.
+    fail_fast : bool
+        Fail fast.
 
     Returns
     -------
@@ -314,7 +326,7 @@ def run_tests(
 
     # Load the calls
     calls = load_config_yaml(calls_path)
-    errors = make_all_calls(calls, data, project_path)
+    errors = make_all_calls(calls, data, project_path, fail_fast)
 
     if errors == 0:
         info('Everything OK')

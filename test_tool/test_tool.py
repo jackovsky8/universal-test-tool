@@ -45,7 +45,18 @@ def main():  # pragma: no cover
     )
 
     parser.add_argument(
-        "-X", "--debug", action="store_true", help="Activate debugging."
+        "-f",
+        "--fail-fast",
+        action="store_true",
+        help="Stop on first error.",
+        default=False,
+    )
+
+    parser.add_argument(
+        "-X",
+        "--debug",
+        action="store_true",
+        help="Activate debugging."
     )
 
     args = parser.parse_args()
@@ -59,7 +70,7 @@ def main():  # pragma: no cover
             level=INFO, format="%(asctime)s | %(levelname)s | %(message)s "
         )
 
-    run_tests(args.project, args.calls, args.data)
+    run_tests(args.project, args.calls, args.data, args.fail_fast)
 
 if __name__ == "__main__":  # pragma: no cover
     main()
