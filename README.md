@@ -324,7 +324,7 @@ Runs a command on a remote machine via ssh.
         password: ${REMOTE_CMD_PASSWORD}
         host: ${REMOTE_CMD_HOST}
         cmd: None
-        return_code: None
+        return_code: 0
 ```
 ##### Parameters:
 | Parameter | Default | Description |
