@@ -38,6 +38,7 @@ class Call(TypedDict):
 
     type: str
     call: Dict[str, Any]
+    line: int
 
 
 # Plugin Name Templates
@@ -281,23 +282,26 @@ def make_all_calls(
         # Recursivly replace variables in call with data
         recursively_replace_variables(call, data)
 
-        # Augment the call with the data from the config
-        LOADED_CALL_TYPES[test["type"]]["augment_call"](call, data, path)
-
         # Call the funktion
         try:
             test_tool_logger.info(
                 "Make call %s in %s plugin.", idx + 1, test["type"]
             )
+            # Augment the call with the data from the config
+            LOADED_CALL_TYPES[test["type"]]["augment_call"](call, data, path)
+            # Make the call
             LOADED_CALL_TYPES[test["type"]]["make_call"](call, data)
         except AssertionError as e:
-            test_tool_logger.error("Assertion failed: %s", e)
+            test_tool_logger.error(
+                "Assertion error for test from line %s: %s", call["line"], e
+            )
             errors += 1
         except Exception as e:  # pylint: disable=broad-except
             test_tool_logger.error(
-                'Exception "%s" occured (This might be a problem with the'
-                + " plugin or config).",
+                'Exception "%s" occured for test from line %s '
+                + "(This might be a problem with the plugin or config).",
                 e,
+                test["line"],
             )
             # if debug:
             if test_tool_logger.getEffectiveLevel() == DEBUG:
@@ -311,26 +315,49 @@ def make_all_calls(
     return errors
 
 
-def load_config_yaml(config: Path) -> Any:
+def load_config_yaml(path: Path, add_line_numbers: bool = False) -> Any:
     """
     Load a yaml config file.
 
     Parameters
     ----------
-    config : Path
-        Path to the config file.
+    path : Path
+        Path to the file.
+    add_line_numbers : bool, optional
+        Add line numbers to the loaded data,
+        if the data is a list, by default False
 
     Returns
     -------
     Dict[str, Any]
         The loaded config.
     """
-    with open(config, "r", encoding="utf-8") as stream:
-        try:
-            return safe_load(stream)
-        except YAMLError as exc:
-            test_tool_logger.error(exc)
-            exit(1)
+    with open(path, "r", encoding="utf-8") as file:
+        content = file.read()
+
+    try:
+        data = safe_load(content)
+    except YAMLError as e:
+        test_tool_logger.error(e)
+        exit(1)
+
+    if add_line_numbers and isinstance(data, list):
+        line_numbers = []
+        # Every call starts with "- call:"
+        intendation = 0
+        for idx, line in enumerate(content.split("\n")):
+            if "- call:" in line:
+                # Count characters before "- call:"
+                if idx > 0 and len(line) - len(line.lstrip()) == intendation:
+                    line_numbers.append(idx + 1)
+                elif idx == 0:
+                    intendation = len(line) - len(line.lstrip())
+
+        for idx, element in enumerate(data):
+            if isinstance(element, dict):
+                element["line"] = line_numbers[idx]
+
+    return data
 
 
 def run_tests(
@@ -398,7 +425,7 @@ def run_tests(
         test_tool_logger.addHandler(fh)
 
     # Load the calls
-    calls: List[Call] = load_config_yaml(calls_path)
+    calls: List[Call] = load_config_yaml(calls_path, True)
     errors = make_all_calls(calls, data, project_path, continue_tests)
 
     if errors == 0:
