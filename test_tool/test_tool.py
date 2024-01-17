@@ -18,8 +18,8 @@ def main() -> None:  # pragma: no cover
     This is the program's entry point.
     """
     parser = ArgumentParser(
-        prog="Test-Tool",
-        description="This programm is a tool for running tests.",
+        prog="test-tool",
+        description="This programm runs tests configured by a yaml file.",
         epilog="universal-test-tool Copyright (C) 2023 jackovsky8",
     )
 
