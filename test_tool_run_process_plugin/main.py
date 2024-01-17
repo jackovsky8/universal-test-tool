@@ -1,65 +1,108 @@
+"""
+Module for the test-tool-run-process-plugin.
+"""
 from enum import Enum
 from errno import ESRCH
 from json import loads
 from logging import DEBUG, debug, error, info, root
 from pathlib import Path
 from subprocess import PIPE, Popen
-from threading import Thread, Timer, Event
-from typing import Any, Dict, TypedDict, Hashable, List
+from threading import Event, Thread, Timer
+from typing import Any, Dict, Hashable, List, Optional, TypedDict
+from io import TextIOWrapper
 
 
 class RunProcessSaveType(Enum):
+    """
+    This class represents the type of the save.
+    """
+
     JSON = 1
     STRING = 2
 
 
 class BashProgramType(Enum):
-    BASH = '/bin/bash'
-    SH = '/bin/sh'
-    ZSH = '/bin/zsh'
+    """
+    This class represents the type of the bash program.
+    """
+
+    BASH = "/bin/bash"
+    SH = "/bin/sh"
+    ZSH = "/bin/zsh"
 
 
 class RunProcessSave(TypedDict):
+    """
+    This class represents a run process save.
+    """
+
     name: str
-    type: str
+    type: RunProcessSaveType
+    path: Optional[List[str]]
 
 
-class RunProcessCall():
+class RunProcessCall(TypedDict):
+    """
+    This class represents a run process call.
+    """
+
     cmd: str
     timeout: int
-    save: RunProcessSave
+    save: Optional[RunProcessSave]
     shell: bool
     text: bool
-    program: str
-    return_code: int
+    program: BashProgramType
+    return_code: Optional[int]
 
 
 append_to_run_process_call: Dict[Hashable, str] = {
-    BashProgramType.BASH: '\nexit\n',
-    BashProgramType.SH: '\nexit\n',
-    BashProgramType.ZSH: '\nexit\n'
+    BashProgramType.BASH: "\nexit\n",
+    BashProgramType.SH: "\nexit\n",
+    BashProgramType.ZSH: "\nexit\n",
 }
 
 default_run_process_call: RunProcessCall = {
-    'cmd': None,
-    'timeout': None,
-    'save': None,
-    'shell': True,
-    'text': True,
-    'program': '/bin/bash',
-    'return_code': None
+    "cmd": None,  # type: ignore
+    "timeout": 0,
+    "save": None,
+    "shell": True,
+    "text": True,
+    "program": "/bin/bash",  # type: ignore
+    "return_code": 0,
 }
 
 
-def log_output(pipe, prefix: str, is_error: bool = False, output_list: List = [], stop_event: Event = None):
+def log_output(
+    pipe,
+    prefix: str,
+    is_error: bool,
+    output_list: List,
+    stop_event: Event,
+):
+    """
+    Log the output of a pipe.
+
+    Parameters
+    ----------
+    pipe : IO
+        The pipe.
+    prefix : str
+        The prefix.
+    is_error : bool
+        If the pipe is an error pipe.
+    output_list : List
+        The output list.
+    stop_event : Event
+        The stop event.
+    """
     if is_error:
         log = error
     else:
         log = info
 
-    for line in iter(pipe.readline, b''):
+    for line in iter(pipe.readline, b""):
         if line.strip():
-            log(f'{prefix}: {line.strip()}')
+            log(f"{prefix}: {line.strip()}")
             output_list.append(line)
         # Stop the thread if the stop event is set
         if stop_event and stop_event.is_set():
@@ -67,11 +110,19 @@ def log_output(pipe, prefix: str, is_error: bool = False, output_list: List = []
 
 
 def timeout_cmd(p: Popen):
+    """
+    Timeout a cmd.
+
+    Parameters
+    ----------
+    p : Popen
+        The cmd.
+    """
     if p.poll() is None:
         try:
             p.terminate()
             if DEBUG >= root.level:
-                error('Timeout for cmd reached.')
+                error("Timeout for cmd reached.")
             exit(1)
         except OSError as e:
             if e.errno != ESRCH:
@@ -79,18 +130,44 @@ def timeout_cmd(p: Popen):
 
 
 def run_cmd(
-        command: str,
-        timeout: float,
-        shell: bool,
-        text: bool,
-        program: BashProgramType,
-        expected_return_code: int) -> str:
-    process = Popen(program.value,
-                    shell=shell,
-                    stdout=PIPE,
-                    stderr=PIPE,
-                    stdin=PIPE,
-                    text=text)
+    command: str,
+    timeout: float,
+    shell: bool,
+    text: bool,
+    program: BashProgramType,
+    expected_return_code: Optional[int],
+) -> str:
+    """
+    Run a cmd.
+
+    Parameters
+    ----------
+    command : str
+        The command.
+    timeout : float
+        The timeout.
+    shell : bool
+        If the command should be run in a shell.
+    text : bool
+        If the command should be run in text mode.
+    program : BashProgramType
+        The program.
+    expected_return_code : Optional[int]
+        The expected return code.
+
+    Returns
+    -------
+    str
+        The output of the cmd.
+    """
+    process = Popen(
+        program.value,
+        shell=shell,
+        stdout=PIPE,
+        stderr=PIPE,
+        stdin=PIPE,
+        text=text,
+    )
 
     if timeout:
         # Start a timer that will kill the cmd if it runs too long
@@ -100,16 +177,21 @@ def run_cmd(
     # Create an event to signal threads to stop
     stop_event = Event()
     # Start threads to read output and error streams
-    output_list = []
-    output_thread = Thread(target=log_output, args=(
-        process.stdout, "Output", False, output_list, stop_event))
-    error_thread = Thread(target=log_output, args=(
-        process.stderr, "Error", True, output_list, stop_event))
+    output_list: List[str] = []
+    output_thread = Thread(
+        target=log_output,
+        args=(process.stdout, "Output", False, output_list, stop_event),
+    )
+    error_thread = Thread(
+        target=log_output,
+        args=(process.stderr, "Error", True, output_list, stop_event),
+    )
 
     output_thread.start()
     error_thread.start()
 
     # Stream the output of the cmd but also store it in a list
+    assert isinstance(process.stdin, TextIOWrapper)
     process.stdin.write(command + append_to_run_process_call[program])
     process.stdin.flush()
 
@@ -121,73 +203,111 @@ def run_cmd(
     output_thread.join()
     error_thread.join()
 
-    if timeout is not None:
+    if timeout:
         t.cancel()
 
-    if expected_return_code is not None and return_code != expected_return_code:
+    if (
+        expected_return_code is not None
+        and return_code != expected_return_code
+    ):
         error(
-            f'Cmd terminated with code {return_code} insted of {expected_return_code}.')
+            f"Cmd terminated with code {return_code} insted of"
+            + " {expected_return_code}."
+        )
         assert False
 
-    return ''.join(output_list).strip()
+    return "".join(output_list).strip()
 
 
 def make_run_process_call(call: RunProcessCall, data: Dict[str, Any]) -> None:
+    """
+    Make a run process call.
+
+    Parameters
+    ----------
+    call : RunProcessCall
+        The call.
+    data : Dict[str, Any]
+        The data.
+    """
     info(f'Run the cmd {call["cmd"]}.')
 
     result = run_cmd(
-        call['cmd'],
-        call['timeout'],
-        call['shell'],
-        call['text'],
-        call['program'],
-        call['return_code'])
+        call["cmd"],
+        call["timeout"],
+        call["shell"],
+        call["text"],
+        call["program"],
+        call["return_code"],
+    )
 
-    if call['save'] is not None:
-        try:
-            call['save']['type'] = RunProcessSaveType[call['save']['type']]
-        except KeyError as e:
-            if "'type'" == str(e):
-                call['type'] = RunProcessSaveType.STRING
-            else:
-                error(f'Save type {str(e)} is not supported.')
+    if call["save"] is not None:
+        if call["save"]["type"] is None:
+            call["save"]["type"] = RunProcessSaveType.STRING
+        else:
+            try:
+                call["save"]["type"] = RunProcessSaveType[
+                    call["save"]["type"]]  # type: ignore
+            except KeyError as e:
+                raise ValueError(
+                    f"Save type {str(e)} is not supported.") from e
 
-        if call['save']['type'] == RunProcessSaveType.JSON:
+        if call["save"]["type"] == RunProcessSaveType.JSON:
             val = loads(result.replace("'", '"'))
             try:
-                call['save']['path']
+                call["save"]["path"]
             except KeyError:
-                call['save']['path'] = []
+                call["save"]["path"] = []
 
-            for p in call['save']['path']:
+            for p in call["save"]["path"]:  # type: ignore
                 val = val[p]
 
             debug(f'Save {val} as {call["save"]["name"]}')
-            data[call['save']['name']] = val
-        elif call['save']['type'] == RunProcessSaveType.STRING:
+            data[call["save"]["name"]] = val
+        elif call["save"]["type"] == RunProcessSaveType.STRING:
             debug(f'Save {result} as {call["save"]["name"]}')
-            data[call['save']['name']] = result
+            data[call["save"]["name"]] = result
 
 
-def augment_run_process_call(call: RunProcessCall, data: Dict, path: Path) -> None:
+def augment_run_process_call(
+    call: RunProcessCall,
+    data: Dict[str, Any],  # pylint: disable=unused-argument
+    path: Path,  # pylint: disable=unused-argument
+) -> None:
+    """
+    Augment an run process call.
+
+    Parameters
+    ----------
+    call : RunProcessCall
+        The call.
+    data : Dict
+        The data.
+    path : Path
+        The path.
+    """
     # timeout as int
-    if call['timeout'] is not None:
-        call['timeout'] = int(call['timeout'])
+    call["timeout"] = int(call["timeout"])
 
     # return_code as int
-    if call['return_code'] is not None:
-        call['return_code'] = int(call['return_code'])
+    if call["return_code"] is not None:
+        call["return_code"] = int(call["return_code"])
 
     # Default save type is string
-    if call['save'] is not None:
-        if call['save']['type'] is None:
-            call['save']['type'] = RunProcessSaveType.STRING
+    if call["save"] is not None:
+        if call["save"]["type"] is None:
+            call["save"]["type"] = RunProcessSaveType.STRING
 
     try:
-        call['program'] = BashProgramType(call['program'])
+        call["program"] = BashProgramType(call["program"])
     except ValueError as e:
-        error(f'Program type {call["program"]} is not supported.')
+        raise ValueError(
+            f'Program type {call["program"]} is not supported.'
+        ) from e
 
 
 def main() -> None:
-    print('test-tool-bash-cmd-plugin')
+    """
+    Main function for the test-tool-run-process-plugin.
+    """
+    print("test-tool-run-process-plugin")
