@@ -4,6 +4,18 @@ Changelog
 
 (unreleased)
 ------------
+- Bug: formatting. [Jakob Graf]
+- Bug: types. [Jakob Graf]
+- Feat: improve rest plugin. [Jakob Graf]
+- Bug: formatting. [Jakob Graf]
+- Feat: line numbers on errors. [Jakob Graf]
+- Bug: minor bug fixes and formatting. [Jakob Graf]
+- Feat: improve logging and formatting. [Jakob Graf]
+
+
+0.1.6 (2024-01-16)
+------------------
+- Release: version 0.1.6 🚀 [Jakob Graf]
 - Feat: ssh cmd assertion. [Jakob Graf]
 - Feat: fail fast. [Jakob Graf]
 
