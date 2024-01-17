@@ -10,7 +10,8 @@ from typing import Any, Dict, List, TypedDict
 
 class SqlPlusNotAvailable(Exception):
     """
-    This class represents an exception if the sql plus command is not available.
+    This class represents an exception if the sql plus
+    command is not available.
     """
 
 
@@ -18,6 +19,7 @@ class SqlPlusCall(TypedDict):
     """
     This class represents a sql plus call.
     """
+
     file: Path
     command: str
     connection: str
@@ -26,17 +28,21 @@ class SqlPlusCall(TypedDict):
 
 
 default_sql_plus_call: SqlPlusCall = {
-    'file': None,
-    'command': 'sqlplus',
-    'connection': '${DB_CONNECTION}',
-    'username': '${DB_USERNAME}',
-    'password': '${DB_PASSWORD}'
+    "file": None,  # type: ignore
+    "command": "sqlplus",
+    "connection": "${DB_CONNECTION}",
+    "username": "${DB_USERNAME}",
+    "password": "${DB_PASSWORD}",
 }
 
 
 def log_output(
-        pipe, prefix: str, output_list: List,
-        is_error: bool = False, stop_event: Event = None) -> None:
+    pipe,
+    prefix: str,
+    output_list: List,
+    is_error: bool,
+    stop_event: Event,
+) -> None:
     """
     This function logs the output of the pipe.
 
@@ -58,9 +64,9 @@ def log_output(
     else:
         log = info
 
-    for line in iter(pipe.readline, b''):
+    for line in iter(pipe.readline, b""):
         if line.strip():
-            log(f'{prefix}: {line.strip()}')
+            log(f"{prefix}: {line.strip()}")
             output_list.append(line)
         # Stop the thread if the stop event is set
         if stop_event and stop_event.is_set():
@@ -86,29 +92,32 @@ def run_cmd(command: str) -> str:
     AssertionError
         If the return code is not 0.
     """
-    process = Popen(command,
-                    shell=True,
-                    stdout=PIPE,
-                    stderr=PIPE,
-                    stdin=PIPE,
-                    text=True)
-    debug(f'Run command: {command}')
+    process = Popen(
+        command, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True
+    )
+    debug(f"Run command: {command}")
 
     # Create an event to signal threads to stop
     stop_event = Event()
 
     # Start threads to read output and error streams
-    output_list = []
-    output_thread = Thread(target=log_output, args=(
-        process.stdout, "Output", output_list, False, stop_event))
-    error_thread = Thread(target=log_output, args=(
-        process.stderr, "Error", output_list, True, stop_event))
+    output_list: List[str] = []
+    output_thread = Thread(
+        target=log_output,
+        args=(process.stdout, "Output", output_list, False, stop_event),
+    )
+    error_thread = Thread(
+        target=log_output,
+        args=(process.stderr, "Error", output_list, True, stop_event),
+    )
 
     output_thread.start()
     error_thread.start()
 
     return_code = process.wait()
-    assert return_code == 0, f'Sqlplus command failed with return code {return_code}'
+    assert (
+        return_code == 0
+    ), f"Sqlplus command failed with return code {return_code}"
 
     # Signal the threads to stop
     stop_event.set()
@@ -117,7 +126,7 @@ def run_cmd(command: str) -> str:
     output_thread.join()
     error_thread.join()
 
-    return ''.join(output_list).strip()
+    return "".join(output_list).strip()
 
 
 def check_sql_plus(command: str) -> None:
@@ -134,18 +143,20 @@ def check_sql_plus(command: str) -> None:
     SqlPlusNotAvailable
         If the sql plus command is not available.
     """
-    command = f'{command} -v'
+    command = f"{command} -v"
     try:
         result = run_cmd(command)
-        if result.startswith('SQL*Plus:'):
+        if result.startswith("SQL*Plus:"):
             return
     except AssertionError:
         pass
 
-    raise SqlPlusNotAvailable('Sql plus command not available.')
+    raise SqlPlusNotAvailable("Sql plus command not available.")
 
 
-def run_sql(command: str, file: Path, connection: str, username: str, password: str) -> None:
+def run_sql(
+    command: str, file: Path, connection: str, username: str, password: str
+) -> None:
     """
     This function runs the sql plus command.
     """
@@ -169,14 +180,21 @@ def make_sql_plus_call(call: SqlPlusCall, data: Dict[str, Any]) -> None:
     info(f'Run sql file: {call["file"]}')
 
     # Check if the sql plus command is available
-    check_sql_plus(call['command'])
+    check_sql_plus(call["command"])
 
     # Run the sql plus command
-    run_sql(call['command'], call['file'], call['connection'],
-            call['username'], call['password'])
+    run_sql(
+        call["command"],
+        call["file"],
+        call["connection"],
+        call["username"],
+        call["password"],
+    )
 
 
-def augment_sql_plus_call(call: SqlPlusCall, data: Dict[str, Any], path: Path) -> None:
+def augment_sql_plus_call(
+    call: SqlPlusCall, data: Dict[str, Any], path: Path
+) -> None:
     """
     This function augments the sql plus call with the default values.
 
@@ -189,12 +207,14 @@ def augment_sql_plus_call(call: SqlPlusCall, data: Dict[str, Any], path: Path) -
     path : Path
         The path to the test file.
     """
-    if call['file'] is not None:
-        call['file'] = path.joinpath(call['file'])
+    if call["file"] is None:
+        raise ValueError("The file parameter is required.")
+    else:
+        call["file"] = path.joinpath(call["file"])
 
 
 def main() -> None:
     """
     This is the main entry point of the plugin.
     """
-    print('test-tool-sql-plus-plugin')
+    print("test-tool-sql-plus-plugin")

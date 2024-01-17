@@ -3,13 +3,13 @@ Module for the test-tool-run-process-plugin.
 """
 from enum import Enum
 from errno import ESRCH
+from io import TextIOWrapper
 from json import loads
 from logging import DEBUG, debug, error, info, root
 from pathlib import Path
 from subprocess import PIPE, Popen
 from threading import Event, Thread, Timer
 from typing import Any, Dict, Hashable, List, Optional, TypedDict
-from io import TextIOWrapper
 
 
 class RunProcessSaveType(Enum):
@@ -247,10 +247,12 @@ def make_run_process_call(call: RunProcessCall, data: Dict[str, Any]) -> None:
         else:
             try:
                 call["save"]["type"] = RunProcessSaveType[
-                    call["save"]["type"]]  # type: ignore
+                    call["save"]["type"]
+                ]  # type: ignore
             except KeyError as e:
                 raise ValueError(
-                    f"Save type {str(e)} is not supported.") from e
+                    f"Save type {str(e)} is not supported."
+                ) from e
 
         if call["save"]["type"] == RunProcessSaveType.JSON:
             val = loads(result.replace("'", '"'))

@@ -5,7 +5,7 @@ It provides the ability to run commands on a remote host via SSH.
 """
 from logging import error, info
 from pathlib import Path
-from typing import Any, Callable, Dict, List, TypedDict
+from typing import Any, Callable, Dict, TypedDict
 
 from paramiko import AutoAddPolicy, SSHClient
 
@@ -14,23 +14,26 @@ class SshCmdCall(TypedDict):
     """
     Class for SshCmdCall.
     """
+
     user: str
     password: str
     host: str
-    cmd: List[str]
+    cmd: str
     return_code: int
 
 
 default_ssh_cmd_call: SshCmdCall = {
-    'user': '${REMOTE_CMD_USER}',
-    'password': '${REMOTE_CMD_PASSWORD}',
-    'host': '${REMOTE_CMD_HOST}',
-    'cmd': None,
-    'return_code': 0
+    "user": "${REMOTE_CMD_USER}",
+    "password": "${REMOTE_CMD_PASSWORD}",
+    "host": "${REMOTE_CMD_HOST}",
+    "cmd": "",
+    "return_code": 0,
 }
 
 
-def run_with_ssh_client(user: str, host: str, password: str, call: Callable[[SSHClient], None]) -> None:
+def run_with_ssh_client(
+    user: str, host: str, password: str, call: Callable[[SSHClient], None]
+) -> None:
     """
     Run the callable with an SSH client.
 
@@ -46,7 +49,7 @@ def run_with_ssh_client(user: str, host: str, password: str, call: Callable[[SSH
         The callable.
     """
     # Create an SSH client
-    info(f'Connect to {user}@{host}')
+    info(f"Connect to {user}@{host}")
     client = SSHClient()
 
     # Automatically add the server's host key
@@ -63,7 +66,9 @@ def run_with_ssh_client(user: str, host: str, password: str, call: Callable[[SSH
         client.close()
 
 
-def run_ssh_cmd(client: SSHClient, cmd: str, expected_return_code: int) -> None:
+def run_ssh_cmd(
+    client: SSHClient, cmd: str, expected_return_code: int
+) -> None:
     """
     Run an SSH command.
 
@@ -91,7 +96,9 @@ def run_ssh_cmd(client: SSHClient, cmd: str, expected_return_code: int) -> None:
     return_code = stdout.channel.recv_exit_status()
     if expected_return_code is not None:
         equals: bool = return_code == expected_return_code
-        assert equals, f'Expected return code {expected_return_code}, got {return_code}'
+        assert (
+            equals
+        ), f"Expected return code {expected_return_code}, got {return_code}"
     else:
         info(f"SSH Command return with code: {return_code}")
 
@@ -109,8 +116,12 @@ def make_ssh_cmd_call(call: SshCmdCall, data: Dict[str, Any]) -> None:
     """
     info(f'Run the cmd {call["cmd"]} remotely.')
     # Run the cmd with client
-    run_with_ssh_client(call['user'], call['host'], call['password'],
-                        lambda client: run_ssh_cmd(client, call['cmd'], call['return_code']))
+    run_with_ssh_client(
+        call["user"],
+        call["host"],
+        call["password"],
+        lambda client: run_ssh_cmd(client, call["cmd"], call["return_code"]),
+    )
 
 
 def augment_ssh_cmd_call(call: SshCmdCall, data: Dict, path: Path) -> None:
@@ -126,12 +137,12 @@ def augment_ssh_cmd_call(call: SshCmdCall, data: Dict, path: Path) -> None:
     path : Path
         The path.
     """
-    if call['return_code'] is not None:
-        call['return_code'] = int(call['return_code'])
+    if call["return_code"] is not None:
+        call["return_code"] = int(call["return_code"])
 
 
 def main() -> None:
     """
     Main function.
     """
-    print('test-tool-ssh-cmd-plugin')
+    print("test-tool-ssh-cmd-plugin")
