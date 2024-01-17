@@ -6,7 +6,9 @@
 types-PyYAML
 python-dotenv
 paramiko
+types-paramiko
 JayDeBeApi
 requests
+types-requests
 selenium
 webdriver_manager
