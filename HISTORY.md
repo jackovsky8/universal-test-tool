@@ -4,6 +4,12 @@ Changelog
 
 (unreleased)
 ------------
+- Bug: line numbers. [Jakob Graf]
+
+
+0.1.7 (2024-01-17)
+------------------
+- Release: version 0.1.7 🚀 [Jakob Graf]
 - Bug: formatting. [Jakob Graf]
 - Bug: types. [Jakob Graf]
 - Feat: improve rest plugin. [Jakob Graf]
