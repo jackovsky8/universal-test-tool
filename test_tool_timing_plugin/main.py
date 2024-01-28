@@ -100,6 +100,9 @@ def augment_timing_call(call: TimingCall, data: Dict, path: Path) -> None:  # py
     else:
         call["action"] = Action(call["action"])  # type: ignore
 
+    if "timing_plugin_calls" not in data:
+        data["timing_plugin_calls"] = {}
+    
     data["timing_plugin_calls"][call["name"]] = {
         "start_time": 0.0,
         "stop_time": 0.0,
