@@ -3,6 +3,7 @@ test_tool base module.
 
 This is the principal module of the test_tool project.
 """
+import sys
 from copy import deepcopy
 from datetime import datetime
 from importlib import import_module
@@ -339,7 +340,7 @@ def load_config_yaml(path: Path, add_line_numbers: bool = False) -> Any:
         data = safe_load(content)
     except YAMLError as e:
         test_tool_logger.error(e)
-        exit(1)
+        sys.exit(1)
 
     if add_line_numbers and isinstance(data, list):
         line_numbers = []
@@ -431,9 +432,11 @@ def run_tests(
 
     if errors == 0:
         test_tool_logger.info("Everything OK")
+        sys.exit(0)
     else:
         test_tool_logger.error(
             "There occured %s test_tool_logger.errors while testing,"
             + "please check the logs",
             errors,
         )
+        sys.exit(1)

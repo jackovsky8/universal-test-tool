@@ -11,6 +11,8 @@ from pathlib import Path
 from test_tool.base import run_tests
 
 
+VERSION: str = "0.1.10"
+
 def get_version_from_file() -> str:
     """
     Get the version of the program from the VERSION file.
@@ -83,7 +85,7 @@ def main() -> None:  # pragma: no cover
         "-v",
         "--version",
         action="version",
-        version=f"%(prog)s {get_version_from_file()}",
+        version=f"%(prog)s {VERSION}",
         help="Show the version of the program.",
     )
 
