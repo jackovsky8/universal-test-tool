@@ -6,8 +6,24 @@ It is executed when the program is called from the command line.
 from argparse import ArgumentParser
 from logging import DEBUG, INFO, basicConfig
 from os import getcwd
+from pathlib import Path
 
 from test_tool.base import run_tests
+
+
+def get_version_from_file() -> str:
+    """
+    Get the version of the program from the VERSION file.
+
+    Returns:
+    --------
+    str
+        The version of the program.
+    """
+    file = Path(__file__).parent.joinpath("VERSION")
+    with open(file, 'r', encoding="utf-8") as f:
+        version = f.read().strip()
+    return version
 
 
 def main() -> None:  # pragma: no cover
@@ -61,6 +77,14 @@ def main() -> None:  # pragma: no cover
         action="store",
         help="Create a folder with the logs of the tests.",
         default="runs/%Y%m%d_%H%M%S",
+    )
+
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"%(prog)s {get_version_from_file()}",
+        help="Show the version of the program.",
     )
 
     parser.add_argument(
