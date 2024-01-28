@@ -4,6 +4,13 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: new version. [Jakob Graf]
+- Bug: version and exit. [Jakob Graf]
+
+
+0.1.10 (2024-01-28)
+-------------------
+- Release: version 0.1.10 🚀 [Jakob Graf]
 - Feat: support windows commnds. [Jakob Graf]
 - Feat: make version printable. [Jakob Graf]
 
