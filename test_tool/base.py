@@ -293,7 +293,7 @@ def make_all_calls(
             LOADED_CALL_TYPES[test["type"]]["make_call"](call, data)
         except AssertionError as e:
             test_tool_logger.error(
-                "Assertion error for test from line %s: %s", call["line"], e
+                "Assertion error for test from line %s: %s", test["line"], e
             )
             errors += 1
         except Exception as e:  # pylint: disable=broad-except

@@ -3,7 +3,7 @@ This is the main file of the plugin. It is called by the test tool and
 contains the main function.
 """
 from enum import Enum
-from json import JSONDecodeError, dumps
+import json
 from logging import error, info
 from pathlib import Path
 from typing import IO, Any, Dict, List, Optional, Tuple, TypedDict
@@ -28,6 +28,72 @@ class Cert(TypedDict):
 
     path: Path
     key: Optional[str]
+
+
+class BodyType(Enum):
+    """
+    This class represents the type of the request body.
+    """
+    TEXT_PLAIN = 'text/plain'
+    MULTIPART_FORM_DATA = 'multipart/form-data'
+    APPLICATION_JSON = 'application/json'
+    APPLICATION_XML = 'application/xml'
+    APPLICATION_OCTET_STREAM = 'application/octet-stream'
+    APPLICATION_PDF = 'application/pdf'
+    APPLICATION_ZIP = 'application/zip'
+    APPLICATION_GZIP = 'application/gzip'
+    APPLICATION_TAR = 'application/tar'
+    APPLICATION_XHTML_XML = 'application/xhtml+xml'
+    APPLICATION_XML_DTD = 'application/xml-dtd'
+    APPLICATION_XOP_XML = 'application/xop+xml'
+    APPLICATION_X_TAR = 'application/x-tar'
+    APPLICATION_X_GZIP = 'application/x-gzip'
+    APPLICATION_X_BZIP2 = 'application/x-bzip2'
+    APPLICATION_X_7Z_COMPRESSED = 'application/x-7z-compressed'
+    APPLICATION_X_RAR_COMPRESSED = 'application/x-rar-compressed'
+    APPLICATION_X_JAVA_ARCHIVE = 'application/x-java-archive'
+    APPLICATION_X_RAR = 'application/x-rar'
+    APPLICATION_X_SHOCKWAVE_FLASH = 'application/x-shockwave-flash'
+    APPLICATION_X_SQLITE3 = 'application/x-sqlite3'
+    APPLICATION_X_WWW_FORM_URLENCODED = 'application/x-www-form-urlencoded'
+    AUDIO_MPEG = 'audio/mpeg'
+    AUDIO_X_MS_WMA = 'audio/x-ms-wma'
+    AUDIO_X_WAV = 'audio/x-wav'
+    IMAGE_GIF = 'image/gif'
+    IMAGE_JPEG = 'image/jpeg'
+    IMAGE_PNG = 'image/png'
+    IMAGE_SVG_XML = 'image/svg+xml'
+    IMAGE_TIFF = 'image/tiff'
+    IMAGE_VND_MICROSOFT_ICON = 'image/vnd.microsoft.icon'
+    IMAGE_X_ICON = 'image/x-icon'
+    IMAGE_X_MS_BMP = 'image/x-ms-bmp'
+    TEXT_CSS = 'text/css'
+    TEXT_CSV = 'text/csv'
+    TEXT_HTML = 'text/html'
+    TEXT_JAVASCRIPT = 'text/javascript'
+    TEXT_XML = 'text/xml'
+    VIDEO_3GPP = 'video/3gpp'
+    VIDEO_3GPP2 = 'video/3gpp2'
+    VIDEO_MPEG = 'video/mpeg'
+    VIDEO_QUICKTIME = 'video/quicktime'
+    VIDEO_X_MSVIDEO = 'video/x-msvideo'
+    VIDEO_X_SGI_MOVIE = 'video/x-sgi-movie'
+    VIDEO_X_WEBM = 'video/x-webm'
+    VIDEO_X_FLV = 'video/x-flv'
+    VIDEO_X_MATROSKA = 'video/x-matroska'
+    VIDEO_X_MS_WMV = 'video/x-ms-wmv'
+    VIDEO_X_MS_ASF = 'video/x-ms-asf'
+    VIDEO_X_M4V = 'video/x-m4v'
+    VIDEO_X_MSVID = 'video/x-msvid'
+
+
+class Body(TypedDict):
+    """
+    This class represents the body of the request.
+    """
+
+    type: BodyType
+    data: Any
 
 
 class Method(Enum):
@@ -76,7 +142,7 @@ class RestCall(TypedDict):
     url: str
     # Request
     method: Method
-    data: Optional[str | Dict[str, Any]]
+    body: Optional[Body]
     files: Optional[Dict[str, File | LoadedFile | EmptyFile]]
     multipart: Optional[Dict[str, Tuple[None, str, str]]]
     # payload: Optional[Dict[str, str]]
@@ -97,7 +163,7 @@ default_rest_call: RestCall = {
     "path": "${REST_PATH}",
     "url": None,  # type: ignore
     "method": "GET",  # type: ignore
-    "data": None,
+    "body": None,
     "files": None,
     "multipart": None,
     # "payload": None,
@@ -129,8 +195,13 @@ default_rest_call: RestCall = {
     # json: Any | None = ...
 }
 
+default_request_body: Dict[str, Any] = {
+    "type": BodyType.TEXT_PLAIN,
+    "value": None
+}
 
-def pretty_xml(xml: str) -> str:
+
+def pretty_xml(string: str) -> str:
     """
     Return a pretty printed xml string.
 
@@ -144,11 +215,11 @@ def pretty_xml(xml: str) -> str:
     str
         The pretty printed xml string.
     """
-    dom = parseString(xml)
+    dom = parseString(string)
     return dom.toprettyxml()
 
 
-def pretty_json(json: str) -> str:
+def pretty_json(string: str) -> str:
     """
     Return a pretty printed json string.
 
@@ -162,7 +233,7 @@ def pretty_json(json: str) -> str:
     str
         The pretty printed json string.
     """
-    return dumps(json, indent=2)
+    return json.dumps(string, indent=2)
 
 
 # def multipartify(
@@ -233,8 +304,6 @@ def assert_response(call: RestCall) -> None:
     if call["files"]:
         data["files"] = call["files"]
         del data["headers"]["Content-Type"]
-    elif call["data"] is not None:
-        data["data"] = dumps(call["data"])
 
     # Add timeout
     if call["timeout"]:
@@ -242,6 +311,22 @@ def assert_response(call: RestCall) -> None:
 
     # Add verify
     data["verify"] = call["verify"]
+
+    # Add body
+    if call["body"] and "data" in call["body"]:
+        # Default body type
+        if "type" not in call["body"] or not call["body"]["type"]:
+            call["body"]["type"] = BodyType.TEXT_PLAIN
+        else:
+            call["body"]["type"] = BodyType(call["body"]["type"])  # type: ignore
+
+        # Add body
+        if call["body"]["type"] == BodyType.APPLICATION_JSON:
+            data["json"] = call["body"]["data"]
+        elif call["body"]["type"] == BodyType.TEXT_PLAIN:
+            data["data"] = call["body"]["data"]
+        else:
+            raise ValueError("Body type not supported.")
 
     # url: str | bytes,
     # params: _Params | None = None,
@@ -272,8 +357,8 @@ def assert_response(call: RestCall) -> None:
     info(f"Response Status: {response.status_code}")
     if call["hide_logs"] is False:
         try:
-            info(f"Response:\n{dumps(response.json(), indent=2)}")
-        except JSONDecodeError:
+            info(f"Response:\n{json.dumps(response.json(), indent=2)}")
+        except json.JSONDecodeError:
             info(f'Response: "{response.text}"')
 
     assert response.status_code in call["status_codes"]
@@ -398,7 +483,8 @@ def augment_rest_call(
     # Multipart
     if call["multipart"] is not None:
         for key, part in call["multipart"].items():
-            call["multipart"][key] = (None, dumps(part), "application/json")
+            call["multipart"][key] = (
+                None, json.dumps(part), "application/json")
 
     # Payload
     # if call['payload'] is not None:
