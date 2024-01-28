@@ -343,15 +343,16 @@ def load_config_yaml(path: Path, add_line_numbers: bool = False) -> Any:
 
     if add_line_numbers and isinstance(data, list):
         line_numbers = []
-        # Every call starts with "- call:"
+        # Every call starts with "- call: or - type:"
         intendation = 0
         for idx, line in enumerate(content.split("\n")):
-            if "- call:" in line:
+            if "- call:" in line or "- type:" in line:
                 # Count characters before "- call:"
                 if idx > 0 and len(line) - len(line.lstrip()) == intendation:
                     line_numbers.append(idx + 1)
                 elif idx == 0:
                     intendation = len(line) - len(line.lstrip())
+                    line_numbers.append(idx + 1)
 
         for idx, element in enumerate(data):
             if isinstance(element, dict):
