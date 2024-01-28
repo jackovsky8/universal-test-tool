@@ -4,6 +4,12 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: timing plugin. [Jakob Graf]
+
+
+0.1.11 (2024-01-28)
+-------------------
+- Release: version 0.1.11 🚀 [Jakob Graf]
 - Feat: new version. [Jakob Graf]
 - Bug: version and exit. [Jakob Graf]
 
