@@ -39,13 +39,13 @@ class TimingPluginData(TypedDict):
     duration: float
 
 
-default_ssh_cmd_call: TimingCall = {
+default_timing_call: TimingCall = {
     "name": "TIMER",
     "action": "start",  # type: ignore
 }
 
 
-def make_ssh_cmd_call(call: TimingCall, data: Dict[str, Any]) -> None:
+def make_timing_call(call: TimingCall, data: Dict[str, Any]) -> None:
     """
     Make an SSH command call.
 
