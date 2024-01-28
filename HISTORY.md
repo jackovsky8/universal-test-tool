@@ -4,6 +4,13 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: support windows commnds. [Jakob Graf]
+- Feat: make version printable. [Jakob Graf]
+
+
+0.1.9 (2024-01-28)
+------------------
+- Release: version 0.1.9 🚀 [Jakob Graf]
 - Feat: modify rest plugin. [Jakob Graf]
 - Release: version 0.1.8 🚀 [Jakob Graf]
 
