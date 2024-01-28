@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+(unreleased)
+------------
+- Feat: modify rest plugin. [Jakob Graf]
+- Release: version 0.1.8 🚀 [Jakob Graf]
+
+
 0.1.8 (2024-01-28)
 ------------------
 - Release: version 0.1.8 🚀 [Jakob Graf]
