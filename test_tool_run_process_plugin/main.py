@@ -29,6 +29,8 @@ class BashProgramType(Enum):
     BASH = "/bin/bash"
     SH = "/bin/sh"
     ZSH = "/bin/zsh"
+    POWERSHELL = "powershell.exe"
+    CMD = "cmd.exe"
 
 
 class RunProcessSave(TypedDict):
@@ -59,6 +61,8 @@ append_to_run_process_call: Dict[Hashable, str] = {
     BashProgramType.BASH: "\nexit\n",
     BashProgramType.SH: "\nexit\n",
     BashProgramType.ZSH: "\nexit\n",
+    BashProgramType.POWERSHELL: "\nExit\n",
+    BashProgramType.CMD: "\nExit\n",
 }
 
 default_run_process_call: RunProcessCall = {
