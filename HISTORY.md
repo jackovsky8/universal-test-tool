@@ -7,6 +7,12 @@ Changelog
 - Bug: timing plugin. [Jakob Graf]
 
 
+0.1.13 (2024-01-28)
+-------------------
+- Release: version 0.1.13 🚀 [Jakob Graf]
+- Bug: timing plugin. [Jakob Graf]
+
+
 0.1.12 (2024-01-28)
 -------------------
 - Release: version 0.1.12 🚀 [Jakob Graf]
