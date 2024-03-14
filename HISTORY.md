@@ -4,6 +4,50 @@ Changelog
 
 (unreleased)
 ------------
+- Bug: improve timing plugin. [Jakob Graf]
+- Merge pull request #5 from
+  jackovsky8/dependabot/github_actions/softprops/action-gh-release-2.
+  [Graf Jakob]
+
+  build(deps): bump softprops/action-gh-release from 1 to 2
+- Build(deps): bump softprops/action-gh-release from 1 to 2.
+  [dependabot[bot]]
+
+  Bumps [softprops/action-gh-release](https://github.com/softprops/action-gh-release) from 1 to 2.
+  - [Release notes](https://github.com/softprops/action-gh-release/releases)
+  - [Changelog](https://github.com/softprops/action-gh-release/blob/master/CHANGELOG.md)
+  - [Commits](https://github.com/softprops/action-gh-release/compare/v1...v2)
+
+  ---
+  updated-dependencies:
+  - dependency-name: softprops/action-gh-release
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Merge pull request #4 from
+  jackovsky8/dependabot/github_actions/codecov/codecov-action-4. [Graf
+  Jakob]
+
+  build(deps): bump codecov/codecov-action from 3 to 4
+- Build(deps): bump codecov/codecov-action from 3 to 4.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 3 to 4.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+0.1.15 (2024-01-28)
+-------------------
+- Release: version 0.1.15 🚀 [Jakob Graf]
 - Feat: new version. [Jakob Graf]
 
 
