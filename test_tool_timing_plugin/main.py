@@ -60,6 +60,8 @@ def make_timing_call(call: TimingCall, data: Dict[str, Any]) -> None:
     if call["action"] == Action.START:
         info(f'Start timer {call["name"]}')
         t_data["start_time"] = int(time.time() * 1e9)
+        t_data["stop_time"] = t_data["start_time"]
+        t_data["duration"] = 0.0
     elif call["action"] == Action.STOP:
         info(f'Stop timer {call["name"]}')
         t_data["stop_time"] = int(time.time() * 1e9)
@@ -103,11 +105,12 @@ def augment_timing_call(call: TimingCall, data: Dict, path: Path) -> None:  # py
     if "timing_plugin_calls" not in data:
         data["timing_plugin_calls"] = {}
     
-    data["timing_plugin_calls"][call["name"]] = {
-        "start_time": 0.0,
-        "stop_time": 0.0,
-        "duration": 0.0,
-    }
+    if call["name"] not in data["timing_plugin_calls"]:
+        data["timing_plugin_calls"][call["name"]] = {
+            "start_time": 0.0,
+            "stop_time": 0.0,
+            "duration": 0.0,
+        }
 
 
 def main() -> None:
