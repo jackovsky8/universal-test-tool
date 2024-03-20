@@ -4,6 +4,10 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: glob for file upload. [Jakob Graf]
+- Feat: format assert plugin. [Jakob Graf]
+- Feat: replace also dicts and lists. [Jakob Graf]
+- Release: version 0.1.15 🚀 [Jakob Graf]
 - Bug: improve timing plugin. [Jakob Graf]
 - Merge pull request #5 from
   jackovsky8/dependabot/github_actions/softprops/action-gh-release-2.
