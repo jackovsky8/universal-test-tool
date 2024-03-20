@@ -4,7 +4,8 @@ Module for copying files over SSH.
 from logging import debug, error, info
 from pathlib import Path
 from stat import S_ISDIR
-from typing import Any, Callable, Dict, TypedDict
+from typing import Any, Callable, Dict, TypedDict, List
+from glob import glob
 
 from paramiko import AutoAddPolicy, SSHClient
 
@@ -108,16 +109,22 @@ def copy_remote_file(
                 sftp.mkdir(remote_path.as_posix())
 
             # Copy the file
-            if local_path.is_dir():
-                error("Can not copy a directory from local to remote")
-                # TODO: Test
-                # upload_directory(remote_path, local_path, sftp)
-                assert False
-            else:
-                sftp.put(
-                    local_path.as_posix(),
-                    remote_path.joinpath(local_path.name).as_posix(),
-                )
+            files: List[str] = glob(local_path.as_posix())
+            for file in files:
+                local_file: Path = Path(file)
+                if local_file.is_dir():
+                    error("Can not copy a directory from local to remote")
+                    # TODO: Test
+                    # upload_directory(remote_path, local_path, sftp)
+                    assert False
+                elif local_file.is_file():
+                    sftp.put(
+                        local_file,
+                        remote_path.joinpath(local_file.name).as_posix(),
+                    )
+                else:
+                    error(f"File {file} is not a file or directory")
+                    assert False
         else:
             info(
                 f"Copy the file {remote_path.as_posix()} to {local_path.as_posix()}"
