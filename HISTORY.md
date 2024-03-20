@@ -4,6 +4,14 @@ Changelog
 
 (unreleased)
 ------------
+- Bug: replace 0 is not working. [Jakob Graf]
+- Feat: cleanup jdbc plugin. [Jakob Graf]
+- Bug: replace 0 is not working. [Jakob Graf]
+
+
+0.1.18 (2024-03-20)
+-------------------
+- Release: version 0.1.18 🚀 [Jakob Graf]
 - Feat: improve variable templating, dicts and lists. [Jakob Graf]
 
 
