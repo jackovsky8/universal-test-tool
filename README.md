@@ -75,9 +75,9 @@ Copies files and folders between local machine and remote machine via ssh.
 ```yaml
 - type: COPY_FILES_SSH
     call:
-        user: ${REMOTE_CMD_USER}
-        password: ${REMOTE_CMD_PASSWORD}
-        host: ${REMOTE_CMD_HOST}
+        user: "{{REMOTE_CMD_USER}}"
+        password: "{{REMOTE_CMD_PASSWORD}}"
+        host: "{{REMOTE_CMD_HOST}}"
         local_path: None
         remote_path: None
         download: False
@@ -85,9 +85,9 @@ Copies files and folders between local machine and remote machine via ssh.
 ##### Parameters:
 | Parameter | Default | Description |
 |:---------:|:--------:|:--------:|
-|   user   |   ${REMOTE_CMD_USER}   |   The user for the ssh connection.   |
-|   password   |   ${REMOTE_CMD_PASSWORD}   |   The password for the ssh connection.   |
-|   host   |   ${REMOTE_CMD_HOST}   |   The host for the ssh connection.   |
+|   user   |   {{REMOTE_CMD_USER}}   |   The user for the ssh connection.   |
+|   password   |   {{REMOTE_CMD_PASSWORD}}   |   The password for the ssh connection.   |
+|   host   |   {{REMOTE_CMD_HOST}}   |   The host for the ssh connection.   |
 |   local_path   |   None   |   The local file or folder for the transfer.   |
 |   remote_path   |   None   |   The remote file or folder for the transfer.   |
 |   download   |   False   |   If this flag is set to true, the file transfer is a download, otherwise it is an upload.   |
@@ -99,14 +99,14 @@ Runs SQL Statements with [JayDeBeApi](https://pypi.org/project/JayDeBeApi/).
 ```yaml
 - type: JDBC_SQL
     call:
-    query: None,
-    save: [],
-    validate: [],
-    driver: ${DB_DRIVER},
-    driver_path: ${DB_DRIVER_PATH},
-    url: ${DB_URL},
-    username: ${DB_USERNAME},
-    password: ${DB_PASSWORD}
+        query: None
+        save: []
+        validate: []
+        driver: "{{DB_DRIVER}}"
+        driver_path: "{{DB_DRIVER_PATH}}"
+        url: "{{DB_URL}}"
+        username: "{{DB_USERNAME}}"
+        password: "{{DB_PASSWORD}}"
 ```
 Object for save:
 ```yaml
@@ -128,11 +128,11 @@ save:
 |   query   |   None   |   The SQL statement to run   |
 |   save   |   []   |   Save a entry of a cell to a variable   |
 |   vaidate   |   []   |   Validate the entry of a cell   |
-|   driver   |   ${DB_DRIVER}   |   The Class of the driver   |
-|   driver_path   |   ${DB_DRIVER_PATH}   |   The Path of the jar file   |
-|   url   |   ${DB_URL}   |   The jdbc connection string   |
-|   username   |   ${DB_USERNAME}   |   The username of the db   |
-|   password   |   ${DB_PASSWORD}   |   The password of the db   |
+|   driver   |   {{DB_DRIVER}}   |   The Class of the driver   |
+|   driver_path   |   {{DB_DRIVER_PATH}}   |   The Path of the jar file   |
+|   url   |   {{DB_URL}}   |   The jdbc connection string   |
+|   username   |   {{DB_USERNAME}}   |   The username of the db   |
+|   password   |   {{DB_PASSWORD}}   |   The password of the db   |
 
 #### Python (test_tool_python_plugin)
 Run python code from calls.yaml
@@ -156,7 +156,7 @@ Unpacks a jar file and parses and prints the manifest file to the logger. It als
 ```yaml
 - type: READ_JAR_MANIFEST
     call:
-        jar_path: ${PATH_JAR_FILE}
+        jar_path: "{{PATH_JAR_FILE}}"
         manifest_path: META-INF/MANIFEST.MF
         save: []
 ```
@@ -172,7 +172,7 @@ save:
 ##### Parameters:
 | Parameter | Default | Description |
 |:---------:|:--------:|:--------:|
-|   jar_path   |   ${PATH_JAR_FILE}   |   The absolute or relative path to the jar file.   |
+|   jar_path   |   {{PATH_JAR_FILE}}   |   The absolute or relative path to the jar file.   |
 |   manifest_path   |   META-INF/MANIFEST.MF   |   The path within the jar file to the manifest.   |
 |   save   |   None   |   Save values of the result to a variable with the given name.   |
 
@@ -190,8 +190,8 @@ Tests REST endpoints.
 ```yaml
 - type: REST
     call:
-        base_url: ${REST_BASE_URL}
-        path: ${REST_PATH}
+        base_url: "{{REST_BASE_URL}}"
+        path: "{{REST_PATH}}"
         url: None
         method: GET
         data: None
@@ -206,9 +206,9 @@ Tests REST endpoints.
 ##### Parameters:
 | Parameter | Default | Description |
 |:---------:|:--------:|:--------:|
-|   base_url   |   ${REST_BASE_URL}   |   The base url of the service to test.   |
-|   path   |   ${REST_PATH}   |   The path of the endpoint to test.   |
-|   url   |  None   |   The url value is built dynamically from ${base_url}/${path} if not set. Otherwiese the other values are ignored.   |
+|   base_url   |   {{REST_BASE_URL}}   |   The base url of the service to test.   |
+|   path   |   {{REST_PATH}}   |   The path of the endpoint to test.   |
+|   url   |  None   |   The url value is built dynamically from {{base_url}}/{{path}} if not set. Otherwiese the other values are ignored.   |
 |   method   |   GET   |   The method of the call. (GET, POST, DELETE, PUT)   |
 |   data   |   None   |   The data of the http call, an object is used as json.   |
 |   files   |   None   |   Path of files to send.   |
@@ -271,9 +271,9 @@ Start a webbrowser and run tests via [selenium](https://selenium-python.readthed
 - type: SELENIUM
     call:
         actions: []
-        base_url: '${GUI_BASE_URL}',
-        path: '${GUI_PATH}',
-        url: None,
+        base_url: "{{GUI_BASE_URL}}"
+        path: '"{{GUI_PATH}}"
+        url: None
         webdriver: ['chrome']
 ```
 
@@ -290,9 +290,9 @@ log: None
 | Parameter | Default | Description |
 |:---------:|:--------:|:--------:|
 |   actions   |   None   |   The actions to run on the website.   |
-|   base_url   |   ${REST_BASE_URL}   |   The base url of the website to test.   |
-|   path   |   ${REST_PATH}   |   The path of the website to test.   |
-|   url   |  None   |   The url value is built dynamically from ${base_url}/${path} if not set. Otherwiese the other values are ignored.   |
+|   base_url   |   {{REST_BASE_URL}}   |   The base url of the website to test.   |
+|   path   |   {{REST_PATH}}   |   The path of the website to test.   |
+|   url   |  None   |   The url value is built dynamically from {{base_url}}/{{path}} if not set. Otherwiese the other values are ignored.   |
 |   webdriver   |   True   |   A list of webdrivers to test with [chrome, gecko, chromium-edge].   |
 
 
@@ -314,9 +314,9 @@ Runs a sql file with sqlplus.
     call:
         file: None
         command: sqlplus
-        connection: ${DB_CONNECTION}
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
+        connection: "{{DB_CONNECTION}}"
+        username: "{{DB_USERNAME}}"
+        password: "{{DB_PASSWORD}}"
 ```
 
 ##### Parameters:
@@ -324,9 +324,9 @@ Runs a sql file with sqlplus.
 |:---------:|:--------:|:--------:|
 |   file   |   None   |   The file to execute.   |
 |   commane   |   sqlplus   |   The command to execute.   |
-|   connection   |   ${DB_CONNECTION}   |   The connection string to the database.  |
-|   username   |   ${DB_USERNAME}   |   The username of the database.   |
-|   password   |   ${DB_PASSWORD}   |   The password of the database.   |
+|   connection   |   {{DB_CONNECTION}}   |   The connection string to the database.  |
+|   username   |   {{DB_USERNAME}}   |   The username of the database.   |
+|   password   |   {{DB_PASSWORD}}   |   The password of the database.   |
 
 
 #### SSH Cmd (test_tool_ssh_cmd_plugin)
@@ -336,18 +336,18 @@ Runs a command on a remote machine via ssh.
 ```yaml
 - type: SSH_CMD
     call:
-        user: ${REMOTE_CMD_USER}
-        password: ${REMOTE_CMD_PASSWORD}
-        host: ${REMOTE_CMD_HOST}
+        user: "{{REMOTE_CMD_USER}}"
+        password: "{{REMOTE_CMD_PASSWORD}}"
+        host: "{{REMOTE_CMD_HOST}}"
         cmd: None
         return_code: 0
 ```
 ##### Parameters:
 | Parameter | Default | Description |
 |:---------:|:--------:|:--------:|
-|   user   |   ${REMOTE_CMD_USER}   |   The user for the ssh connection.   |
-|   password   |   ${REMOTE_CMD_PASSWORD}   |   The password for the ssh connection.   |
-|   host   |   ${REMOTE_CMD_HOST}   |   The host for the ssh connection.   |
+|   user   |   {{REMOTE_CMD_USER}}   |   The user for the ssh connection.   |
+|   password   |   {{REMOTE_CMD_PASSWORD}}   |   The password for the ssh connection.   |
+|   host   |   {{REMOTE_CMD_HOST}}   |   The host for the ssh connection.   |
 |   cmd   |   None   |   The command to run.   |
 |   return_code   |   None   |   The expected return code of the command 'cmd'.   |
 

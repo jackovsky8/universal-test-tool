@@ -23,9 +23,9 @@ class SshCmdCall(TypedDict):
 
 
 default_ssh_cmd_call: SshCmdCall = {
-    "user": "${REMOTE_CMD_USER}",
-    "password": "${REMOTE_CMD_PASSWORD}",
-    "host": "${REMOTE_CMD_HOST}",
+    "user": "{{REMOTE_CMD_USER}}",
+    "password": "{{REMOTE_CMD_PASSWORD}}",
+    "host": "{{REMOTE_CMD_HOST}}",
     "cmd": "",
     "return_code": 0,
 }

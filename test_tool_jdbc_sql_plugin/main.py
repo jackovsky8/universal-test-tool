@@ -35,11 +35,11 @@ default_jdbc_sql_call: JdbcSqlCall = {
     "query": None,  # type: ignore
     "save": [],
     "validate": [],
-    "driver": "${DB_DRIVER}",
-    "driver_path": "${DB_DRIVER_PATH}",
-    "url": "${DB_URL}",
-    "username": "${DB_USERNAME}",
-    "password": "${DB_PASSWORD}",
+    "driver": "{{DB_DRIVER}}",
+    "driver_path": "{{DB_DRIVER_PATH}}",
+    "url": "{{DB_URL}}",
+    "username": "{{DB_USERNAME}}",
+    "password": "{{DB_PASSWORD}}",
 }
 
 

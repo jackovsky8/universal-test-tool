@@ -27,7 +27,7 @@ class ReadJarManifestCall(TypedDict):
 
 
 default_read_jar_manifest_call: ReadJarManifestCall = {
-    "jar_path": "${PATH_JAR_FILE}",  # type: ignore
+    "jar_path": "{{PATH_JAR_FILE}}",  # type: ignore
     "manifest_path": "META-INF/MANIFEST.MF",
     "save": [],
 }

@@ -192,8 +192,8 @@ class SeleniumAction(TypedDict):
 # Define the default call
 default_selenium_call: SeleniumCall = {
     "actions": [],
-    "base_url": "${GUI_BASE_URL}",
-    "path": "${GUI_PATH}",
+    "base_url": "{{GUI_BASE_URL}}",
+    "path": "{{GUI_PATH}}",
     "url": None,
     "webdriver": ["chrome"],
 }

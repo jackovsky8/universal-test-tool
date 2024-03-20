@@ -159,8 +159,8 @@ class RestCall(TypedDict):
 
 
 default_rest_call: RestCall = {
-    "base_url": "${REST_BASE_URL}",
-    "path": "${REST_PATH}",
+    "base_url": "{{REST_BASE_URL}}",
+    "path": "{{REST_PATH}}",
     "url": None,  # type: ignore
     "method": "GET",  # type: ignore
     "body": None,

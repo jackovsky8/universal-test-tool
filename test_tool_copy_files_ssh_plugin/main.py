@@ -11,6 +11,9 @@ from paramiko import AutoAddPolicy, SSHClient
 
 
 class CopyFilesSshCall(TypedDict):
+    """
+    This class represents an copy files over SSH call.
+    """
     user: str
     password: str
     host: str
@@ -20,9 +23,9 @@ class CopyFilesSshCall(TypedDict):
 
 
 default_copy_files_ssh_call: CopyFilesSshCall = {
-    "user": "${REMOTE_CMD_USER}",
-    "password": "${REMOTE_CMD_PASSWORD}",
-    "host": "${REMOTE_CMD_HOST}",
+    "user": "{{REMOTE_CMD_USER}}",
+    "password": "{{REMOTE_CMD_PASSWORD}}",
+    "host": "{{REMOTE_CMD_HOST}}",
     "local_path": None,  # type: ignore
     "remote_path": None,  # type: ignore
     "download": False,

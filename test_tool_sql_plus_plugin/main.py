@@ -30,9 +30,9 @@ class SqlPlusCall(TypedDict):
 default_sql_plus_call: SqlPlusCall = {
     "file": None,  # type: ignore
     "command": "sqlplus",
-    "connection": "${DB_CONNECTION}",
-    "username": "${DB_USERNAME}",
-    "password": "${DB_PASSWORD}",
+    "connection": "{{DB_CONNECTION}}",
+    "username": "{{DB_USERNAME}}",
+    "password": "{{DB_PASSWORD}}",
 }
 
 
