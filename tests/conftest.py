@@ -1,3 +1,6 @@
+"""
+This file is used to define fixtures that are used in the tests.
+"""
 import sys
 import pytest
 
@@ -5,6 +8,9 @@ import pytest
 # each test runs on cwd to its temp dir
 @pytest.fixture(autouse=True)
 def go_to_tmpdir(request):
+    """
+    Change to the temporary directory for the duration of the test.
+    """
     # Get the fixture dynamically by its name.
     tmpdir = request.getfixturevalue("tmpdir")
     # ensure local test created packages can be imported

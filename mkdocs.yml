@@ -1,2 +1,7 @@
-site_name: universal-test-tool
+site_name: Universal Test Tool
+# theme: material
 theme: readthedocs
+nav:
+  - Home: 'index.md'
+  - Lifecycle:
+    - Substitution: 'lifecycle/substitution.md'

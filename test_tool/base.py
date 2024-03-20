@@ -11,11 +11,12 @@ from logging import DEBUG, INFO, FileHandler, Formatter, getLogger
 from pathlib import Path
 from traceback import print_exception
 from types import FunctionType
-from typing import Any, Callable, Dict, List, Optional, TypedDict
-from re import findall, search, sub
+from typing import Any, Callable, Dict, List, TypedDict
 
+from test_tool import recursively_replace_variables
 from yaml import YAMLError, safe_load
 
+# Get the logger
 test_tool_logger = getLogger("test-tool")
 
 
@@ -125,134 +126,6 @@ def import_plugin(plugin: str) -> bool:
 
     LOADED_CALL_TYPES[plugin] = loaded_plugin
     return True
-
-
-def replace_string_variables(
-    to_change: str, data: Dict[str, Any]
-) -> Optional[str]:
-    """
-    Replace variables in a string.
-
-    Parameters
-    ----------
-    to_change : str
-        String to change.
-    data : Dict[str, Any]
-        Data to use for the changes.
-
-    Returns
-    -------
-    Optional[str]
-        The changed string if it was changed, None otherwise.
-    """
-    changed: Any = to_change
-
-    # Find all variables in the string. Variables are defined as {{foo.bar[0]}}
-    pattern = r"{{[a-zA-Z0-9\_\-\.\[\]]+}}"
-    variables = findall(pattern, changed)
-    # Replace the variables with the data if they are in the data, otherwise leave them
-    for variable in variables:
-        # Remove ${ and }
-        var = variable[2:-2]
-        # Split for objects
-        keys = var.split(".")
-        # Check if path is list
-        list_pattern = r"\[(\d+)\]$"
-        # Keep track for logging
-        log_path = "data"
-        # Get the value
-        value: Dict[str, Any] | List[Any] | str = data
-        for key in keys:
-            is_list = search(list_pattern, key)
-            if is_list:
-                list_key = int(is_list.group(1))
-                key = sub(list_pattern, "", key)
-            try:
-                value = value[key]
-            except KeyError:
-                test_tool_logger.error(
-                    "Key %s not found in %s", key, log_path
-                )
-                value = variable
-                break
-            log_path += "." + key
-            if is_list:
-                try:
-                    value = value[list_key]
-                except IndexError:
-                    test_tool_logger.error(
-                        "Index %s not found in list %s", list_key, log_path
-                    )
-                    value = variable
-                    break
-                log_path += f"[{list_key}]"
-
-        if changed == variable:
-            changed = value
-        else:
-            changed = changed.replace(variable, str(value))
-
-    if changed != to_change:
-        test_tool_logger.debug("Changed value %s to %s.", to_change, changed)
-        return changed
-
-    return None
-
-
-def recursively_replace_variables(
-    to_change: Dict[str, Any], data: Dict[str, Any]
-) -> Optional[Dict[str, Any]]:
-    """
-    Recursively replace variables in a dict.
-
-    Parameters
-    ----------
-    to_change : Dict[str, Any]
-        Dict to change.
-    data : Dict[str, Any]
-        Data to use for the changes.
-
-    Returns
-    -------
-    Dict[str, Any]
-        The changed dict.
-    """
-    changed: bool = False
-    for key, value in to_change.items():
-        test_tool_logger.debug("%s: %s", key, value)
-        changed = False
-        changed_iteration: bool = True
-        while changed_iteration:
-            changed_iteration = False
-            if isinstance(to_change[key], dict):
-                changed_iteration = (
-                    recursively_replace_variables(to_change[key], data) is not None
-                )
-            elif isinstance(to_change[key], list):
-                for idx, val in enumerate(to_change[key]):
-                    if isinstance(val, dict):
-                        new_val = recursively_replace_variables(val, data)
-                        if new_val:
-                            changed_iteration = True
-                            to_change[key][idx] = new_val
-                    elif isinstance(val, str):
-                        new_value = replace_string_variables(val, data)
-                        if new_value:
-                            changed_iteration = True
-                            to_change[key][idx] = new_val
-            elif isinstance(to_change[key], str):
-                new_value = replace_string_variables(to_change[key], data)
-                if new_value is not None:
-                    changed_iteration = True
-                    to_change[key] = new_value
-
-        if changed_iteration:
-            changed = True
-
-    if changed:
-        return to_change
-    else:
-        return None
 
 
 def make_all_calls(
