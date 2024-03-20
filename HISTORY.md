@@ -4,6 +4,18 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: improve substitution format. [Jakob Graf]
+- Feat: improve substitution ci tests. [Jakob Graf]
+- Feat: improve substitution ci tests. [Jakob Graf]
+- Feat: improve substitution format. [Jakob Graf]
+- Feat: improve substitution. [Jakob Graf]
+- Feat: improve docs. [Jakob Graf]
+- Feat: create jekyll-gh-pages.yml. [Graf Jakob]
+
+
+0.1.19 (2024-03-20)
+-------------------
+- Release: version 0.1.19 🚀 [Jakob Graf]
 - Bug: replace 0 is not working. [Jakob Graf]
 - Feat: cleanup jdbc plugin. [Jakob Graf]
 - Bug: replace 0 is not working. [Jakob Graf]
