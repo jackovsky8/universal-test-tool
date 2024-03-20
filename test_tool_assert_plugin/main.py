@@ -42,8 +42,7 @@ default_assert_call: AssertCall = {
 
 
 def make_assert_call(
-    call: AssertCall,
-    data: Dict[str, Any]  # pylint: disable=unused-argument
+    call: AssertCall, data: Dict[str, Any]  # pylint: disable=unused-argument
 ) -> None:
     """
     This function will be called to make the assert call.
@@ -90,8 +89,7 @@ def make_assert_call(
 
 
 def augment_assert_call(
-    call: AssertCall,
-    data: Dict, path: Path  # pylint: disable=unused-argument
+    call: AssertCall, data: Dict, path: Path  # pylint: disable=unused-argument
 ) -> None:
     """
     This function will be called before the function above.

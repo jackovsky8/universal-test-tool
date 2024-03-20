@@ -12,6 +12,7 @@ class JdbcSqlSave(TypedDict):
     """
     This class represents a save object.
     """
+
     row: int
     column: int
     name: str
@@ -21,6 +22,7 @@ class JdbcSqlValidate(TypedDict):
     """
     This class represents a validate object.
     """
+
     row: int
     column: int
     value: str
@@ -30,6 +32,7 @@ class JdbcSqlCall(TypedDict):
     """
     This class represents a JDBC SQL call.
     """
+
     query: str
     save: List[JdbcSqlSave]
     validate: List[JdbcSqlValidate]
@@ -93,9 +96,9 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
             # Validate some values
             for validate in call["validate"]:
                 try:
-                    if str(
-                        rows[validate["row"]][validate["column"]]
-                    ) == str(validate["value"]):
+                    if str(rows[validate["row"]][validate["column"]]) == str(
+                        validate["value"]
+                    ):
                         info(
                             f'Validated row {validate["row"]}, \
                                 column {validate["column"]} with value \
@@ -114,7 +117,9 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
 
 
 def augment_jdbc_sql_call(
-    call: JdbcSqlCall, data: Dict, path: Path  # pylint: disable=unused-argument
+    call: JdbcSqlCall,
+    data: Dict,
+    path: Path,  # pylint: disable=unused-argument
 ) -> None:
     """
     This function will be called before the function above.

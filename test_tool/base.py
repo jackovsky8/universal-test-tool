@@ -13,8 +13,9 @@ from traceback import print_exception
 from types import FunctionType
 from typing import Any, Callable, Dict, List, TypedDict
 
-from test_tool import recursively_replace_variables
 from yaml import YAMLError, safe_load
+
+from test_tool import recursively_replace_variables
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")

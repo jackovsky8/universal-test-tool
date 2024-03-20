@@ -10,13 +10,12 @@ class PythonCall(TypedDict):
     """
     This class represents an python call.
     """
+
     run: str
 
 
 # Define the default call
-default_python_call: PythonCall = {
-    "run": "val='Hello World!'\nprint(val)"
-}
+default_python_call: PythonCall = {"run": "val='Hello World!'\nprint(val)"}
 
 
 def print_function(val: str) -> None:
@@ -32,8 +31,7 @@ def print_function(val: str) -> None:
 
 
 def make_python_call(
-    call: PythonCall,
-    data: Dict[str, Any]  # pylint: disable=unused-argument
+    call: PythonCall, data: Dict[str, Any]  # pylint: disable=unused-argument
 ) -> None:
     """
     This function will be called to make the python call.
@@ -56,9 +54,7 @@ def make_python_call(
     if "PYTHON_PLUGIN" not in data:
         data["PYTHON_PLUGIN"] = {}
 
-    global_vars: Dict[str, Any] = {
-        "PYTHON_PLUGIN": data["PYTHON_PLUGIN"]
-    }
+    global_vars: Dict[str, Any] = {"PYTHON_PLUGIN": data["PYTHON_PLUGIN"]}
     # make sure stdout is taken to the logger
     global_vars["print"] = print_function
 
@@ -72,7 +68,8 @@ def make_python_call(
 
 def augment_python_call(
     call: PythonCall,  # pylint: disable=unused-argument
-    data: Dict, path: Path  # pylint: disable=unused-argument
+    data: Dict,
+    path: Path,  # pylint: disable=unused-argument
 ) -> None:
     """
     This function will be called before the function above.

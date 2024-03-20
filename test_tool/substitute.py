@@ -3,7 +3,7 @@ This module contains the functions to substitute variables.
 """
 from logging import getLogger
 from re import findall, search, sub
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Callable, Dict, List, Optional
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")
@@ -14,7 +14,7 @@ available_pipes: Dict[str, Callable] = {
     "str": str,
     "float": float,
     "bool": bool,
-    "round": round
+    "round": round,
 }
 
 
@@ -69,9 +69,7 @@ def replace_string_variables(
             try:
                 value = value[key]
             except KeyError as e:
-                test_tool_logger.error(
-                    "Key %s not found in %s", key, log_path
-                )
+                test_tool_logger.error("Key %s not found in %s", key, log_path)
                 raise KeyError(f"Key {key} not found in {log_path}") from e
             log_path += "." + key
             if is_list:
@@ -82,7 +80,8 @@ def replace_string_variables(
                         "Index %s not found in list %s", list_key, log_path
                     )
                     raise IndexError(
-                        f"Index {list_key} not found in list {log_path}") from e
+                        f"Index {list_key} not found in list {log_path}"
+                    ) from e
                 log_path += f"[{list_key}]"
 
         if changed == variable:
@@ -105,7 +104,10 @@ def replace_string_variables(
                             pass
                     # remove the quotes
                     if isinstance(argument, str):
-                        if argument[0] == argument[-1] and argument[0] in ["'", '"']:
+                        if argument[0] == argument[-1] and argument[0] in [
+                            "'",
+                            '"',
+                        ]:
                             arguments[idx] = argument[1:-1]
                             argument = arguments[idx]
 

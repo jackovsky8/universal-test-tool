@@ -10,8 +10,8 @@ from pathlib import Path
 
 from test_tool.base import run_tests
 
-
 VERSION: str = "0.1.15"
+
 
 def get_version_from_file() -> str:
     """
@@ -23,7 +23,7 @@ def get_version_from_file() -> str:
         The version of the program.
     """
     file = Path(__file__).parent.joinpath("VERSION")
-    with open(file, 'r', encoding="utf-8") as f:
+    with open(file, "r", encoding="utf-8") as f:
         version = f.read().strip()
     return version
 

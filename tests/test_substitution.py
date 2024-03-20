@@ -2,7 +2,10 @@
 This module contains tests for the substitution module.
 """
 import pytest
-from test_tool.substitute import replace_string_variables, recursively_replace_variables
+from test_tool.substitute import (
+    replace_string_variables,
+    recursively_replace_variables,
+)
 
 
 def test_basic_string_substitution_in_string():
@@ -52,8 +55,9 @@ def test_basic_dict_substitution_in_string():
     data = {"var": {"key": "value"}}
     string = "This is a {{var}}"
 
-    assert replace_string_variables(
-        string, data) == "This is a {'key': 'value'}"
+    assert (
+        replace_string_variables(string, data) == "This is a {'key': 'value'}"
+    )
 
 
 def test_basic_list_substitution_in_string():
@@ -113,7 +117,7 @@ def test_basic_dict_substitution_standalone():
     data = {"var": {"key": "value"}}
     string = "{{var}}"
 
-    assert replace_string_variables(string, data) == {'key': 'value'}
+    assert replace_string_variables(string, data) == {"key": "value"}
 
 
 def test_basic_list_substitution_standalone():
@@ -123,7 +127,8 @@ def test_basic_list_substitution_standalone():
     data = {"var": ["value"]}
     string = "{{var}}"
 
-    assert replace_string_variables(string, data) == ['value']
+    assert replace_string_variables(string, data) == ["value"]
+
 
 def test_basic_list_substitution_last_element_standalone():
     """
@@ -132,7 +137,7 @@ def test_basic_list_substitution_last_element_standalone():
     data = {"var": ["value", "value2"]}
     string = "{{var[-1]}}"
 
-    assert replace_string_variables(string, data) == 'value2'
+    assert replace_string_variables(string, data) == "value2"
 
 
 def test_int_pipe_int_string_substitution():
@@ -155,7 +160,10 @@ def test_int_pipe_float_string_substitution():
     with pytest.raises(ValueError) as excinfo:
         replace_string_variables(string, data)
 
-    assert excinfo.value.args[0] == "invalid literal for int() with base 10: '1.0'"
+    assert (
+        excinfo.value.args[0]
+        == "invalid literal for int() with base 10: '1.0'"
+    )
 
 
 def test_int_pipe_bool_string_substitution():
@@ -168,7 +176,10 @@ def test_int_pipe_bool_string_substitution():
     with pytest.raises(ValueError) as excinfo:
         replace_string_variables(string, data)
 
-    assert excinfo.value.args[0] == "invalid literal for int() with base 10: 'True'"
+    assert (
+        excinfo.value.args[0]
+        == "invalid literal for int() with base 10: 'True'"
+    )
 
 
 def test_int_pipe_random_string_substitution():
@@ -181,7 +192,10 @@ def test_int_pipe_random_string_substitution():
     with pytest.raises(ValueError) as excinfo:
         replace_string_variables(string, data)
 
-    assert excinfo.value.args[0] == "invalid literal for int() with base 10: 'random'"
+    assert (
+        excinfo.value.args[0]
+        == "invalid literal for int() with base 10: 'random'"
+    )
 
 
 def test_float_pipe_int_string_substitution():
@@ -227,7 +241,9 @@ def test_float_pipe_random_string_substitution():
     with pytest.raises(ValueError) as excinfo:
         replace_string_variables(string, data)
 
-    assert excinfo.value.args[0] == "could not convert string to float: 'random'"
+    assert (
+        excinfo.value.args[0] == "could not convert string to float: 'random'"
+    )
 
 
 def test_bool_pipe_int_string_substitution():
@@ -350,7 +366,10 @@ def test_unavailable_pipe_substitution():
     with pytest.raises(KeyError) as excinfo:
         replace_string_variables(string, data)
 
-    assert excinfo.value.args[0] == "Pipe unavailable not found in available pipes"
+    assert (
+        excinfo.value.args[0]
+        == "Pipe unavailable not found in available pipes"
+    )
 
 
 def test_wrong_number_of_arguments_pipe_substitution():
@@ -363,7 +382,9 @@ def test_wrong_number_of_arguments_pipe_substitution():
     with pytest.raises(TypeError) as excinfo:
         replace_string_variables(string, data)
 
-    assert excinfo.value.args[0] == "round() takes at most 2 arguments (3 given)"
+    assert (
+        excinfo.value.args[0] == "round() takes at most 2 arguments (3 given)"
+    )
 
 
 def test_substitute_not_found():
@@ -397,12 +418,10 @@ def test_recursively_substitute():
     Test that the function returns None when no substitution is found.
     """
     data = {"var": "value"}
-    call = {
-        "key": "This is a {{var}}"
-    }
+    call = {"key": "This is a {{var}}"}
 
     recursively_replace_variables(call, data)
-    assert call == {'key': 'This is a value'}
+    assert call == {"key": "This is a value"}
 
 
 def test_recursively_substitute_more_complex():
@@ -410,52 +429,54 @@ def test_recursively_substitute_more_complex():
     Test that the function returns None when no substitution is found.
     """
     data = {"var": "value", "var2": "value2"}
-    call = {
-        "key": "This is a {{var}} and {{var2}}"
-    }
+    call = {"key": "This is a {{var}} and {{var2}}"}
 
     recursively_replace_variables(call, data)
-    assert call == {'key': 'This is a value and value2'}
+    assert call == {"key": "This is a value and value2"}
 
 
 def test_recursively_substitute_more_complex_inducing_dict():
     """
     Test that the function returns None when no substitution is found.
     """
-    data = {"var": "value", "var2": "value2", "var3": {
-        "key": "This is a {{var}} and {{var2}}"}}
-    call = {
-        "key": "{{var3}}"
+    data = {
+        "var": "value",
+        "var2": "value2",
+        "var3": {"key": "This is a {{var}} and {{var2}}"},
     }
+    call = {"key": "{{var3}}"}
 
     recursively_replace_variables(call, data)
-    assert call == {'key': {'key': 'This is a value and value2'}}
+    assert call == {"key": {"key": "This is a value and value2"}}
 
 
 def test_recursively_substitute_more_complex_inducing_list():
     """
     Test that the function returns None when no substitution is found.
     """
-    data = {"var": "value", "var2": "value2", "var3": [
-        "This is a {{var}} and {{var2}}"]}
-    call = {
-        "key": "{{var3}}"
+    data = {
+        "var": "value",
+        "var2": "value2",
+        "var3": ["This is a {{var}} and {{var2}}"],
     }
+    call = {"key": "{{var3}}"}
 
     recursively_replace_variables(call, data)
-    assert call == {'key': ['This is a value and value2']}
+    assert call == {"key": ["This is a value and value2"]}
 
 
 def test_recursively_substitute_more_complex_inducing_list_in_list():
     """
     Test that the function returns None when no substitution is found.
     """
-    data = {"var": "value", "var2": "value2", "var3": [
-        "This is a {{var}} and {{var2}}"]}
-    call = {
-        "key": ["{{var3}}", "{{var3}}"]
+    data = {
+        "var": "value",
+        "var2": "value2",
+        "var3": ["This is a {{var}} and {{var2}}"],
     }
+    call = {"key": ["{{var3}}", "{{var3}}"]}
 
     recursively_replace_variables(call, data)
     assert call == {
-        'key': [['This is a value and value2'], ['This is a value and value2']]}
+        "key": [["This is a value and value2"], ["This is a value and value2"]]
+    }
