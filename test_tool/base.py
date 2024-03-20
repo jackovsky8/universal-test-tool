@@ -18,6 +18,7 @@ from yaml import YAMLError, safe_load
 
 test_tool_logger = getLogger("test-tool")
 
+dd = False
 
 class CallType(TypedDict):
     """
@@ -145,13 +146,20 @@ def replace_string_variables(
     Optional[str]
         The changed string if it was changed, None otherwise.
     """
+    global dd
     changed: Any = to_change
+    if dd == True:
+        print(changed)
+        # print type
+        print(type(changed))
 
     # Find all variables in the string. Variables are defined as {{foo.bar[0]}}
     pattern = r"{{[a-zA-Z0-9\_\-\.\[\]]+}}"
     variables = findall(pattern, changed)
     # Replace the variables with the data if they are in the data, otherwise leave them
     for variable in variables:
+        if variable == "{{LOG_COUNT}}":
+            dd = True
         # Remove ${ and }
         var = variable[2:-2]
         # Split for objects
@@ -242,7 +250,7 @@ def recursively_replace_variables(
                             to_change[key][idx] = new_val
             elif isinstance(to_change[key], str):
                 new_value = replace_string_variables(to_change[key], data)
-                if new_value:
+                if new_value is not None:
                     changed_iteration = True
                     to_change[key] = new_value
 
