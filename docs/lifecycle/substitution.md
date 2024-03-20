@@ -48,7 +48,7 @@ Available Pipes:
 - float
 - str
 - bool
-- round(x) - where x is the number of decimals
+- round:x - where x is the number of decimals
 
 ### Errors
 
