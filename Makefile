@@ -28,8 +28,8 @@ fmt:              ## Format code using black & isort.
 	$(ENV_PREFIX)black -l 79 test_tool_assert_plugin/
 	# $(ENV_PREFIX)isort test_tool_copy_files_ssh_plugin/
 	# $(ENV_PREFIX)black -l 79 test_tool_copy_files_ssh_plugin/
-	# $(ENV_PREFIX)isort test_tool_jdbc_sql_plugin/
-	# $(ENV_PREFIX)black -l 79 test_tool_jdbc_sql_plugin/
+	$(ENV_PREFIX)isort test_tool_jdbc_sql_plugin/
+	$(ENV_PREFIX)black -l 79 test_tool_jdbc_sql_plugin/
 	$(ENV_PREFIX)isort test_tool_python_plugin/
 	$(ENV_PREFIX)black -l 79 test_tool_python_plugin/
 	# $(ENV_PREFIX)isort test_tool_read_jar_manifest_plugin/
@@ -54,8 +54,8 @@ lint:             ## Run pep8, black, mypy linters.
 	$(ENV_PREFIX)black -l 79 --check test_tool_assert_plugin/
 	# $(ENV_PREFIX)flake8 test_tool_copy_files_ssh_plugin/
 	# $(ENV_PREFIX)black -l 79 --check test_tool_copy_files_ssh_plugin/
-	# $(ENV_PREFIX)flake8 test_tool_jdbc_sql_plugin/
-	# $(ENV_PREFIX)black -l 79 --check test_tool_jdbc_sql_plugin/
+	$(ENV_PREFIX)flake8 test_tool_jdbc_sql_plugin/
+	$(ENV_PREFIX)black -l 79 --check test_tool_jdbc_sql_plugin/
 	$(ENV_PREFIX)flake8 test_tool_python_plugin/
 	$(ENV_PREFIX)black -l 79 --check test_tool_python_plugin/
 	# $(ENV_PREFIX)flake8 test_tool_read_jar_manifest_plugin/
@@ -74,7 +74,7 @@ lint:             ## Run pep8, black, mypy linters.
 	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool/
 	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool_assert_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_copy_files_ssh_plugin/
-	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_jdbc_sql_plugin/
+	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool_jdbc_sql_plugin/
 	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool_python_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_read_jar_manifest_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_rest_plugin/
