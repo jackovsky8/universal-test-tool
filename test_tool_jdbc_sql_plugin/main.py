@@ -118,7 +118,7 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
 
 def augment_jdbc_sql_call(
     call: JdbcSqlCall,
-    data: Dict,
+    data: Dict,  # pylint: disable=unused-argument
     path: Path,  # pylint: disable=unused-argument
 ) -> None:
     """
