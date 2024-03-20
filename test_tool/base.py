@@ -12,6 +12,7 @@ from pathlib import Path
 from traceback import print_exception
 from types import FunctionType
 from typing import Any, Callable, Dict, List, Optional, TypedDict
+from re import findall, search, sub
 
 from yaml import YAMLError, safe_load
 
@@ -144,20 +145,52 @@ def replace_string_variables(
     Optional[str]
         The changed string if it was changed, None otherwise.
     """
-    changed: str = to_change
-    for var, val in data.items():
-        # The string we want to search for
-        origin: str = "${" + var + "}"
+    changed: Any = to_change
 
-        # Check if the string contains the origin
-        if not isinstance(val, str) and origin == changed:
-            changed = val
-            break
+    # Find all variables in the string. Variables are defined as {{foo.bar[0]}}
+    pattern = r"{{[a-zA-Z0-9\_\-\.\[\]]+}}"
+    variables = findall(pattern, changed)
+    # Replace the variables with the data if they are in the data, otherwise leave them
+    for variable in variables:
+        # Remove ${ and }
+        var = variable[2:-1]
+        # Split for objects
+        keys = var.split(".")
+        # Check if path is list
+        list_pattern = r"\[(\d+)\]$"
+        # Keep track for logging
+        log_path = "data"
+        # Get the value
+        value: Dict[str, Any] | List[Any] | str = data
+        for key in keys:
+            is_list = search(list_pattern, key)
+            if is_list:
+                list_key = int(is_list.group(1))
+                key = sub(list_pattern, "", key)
+            try:
+                value = value[key]
+            except KeyError:
+                test_tool_logger.error(
+                    "Key %s not found in %s", key, log_path
+                )
+                value = variable
+                break
+            log_path += "." + key
+            if is_list:
+                try:
+                    value = value[list_key]
+                except IndexError:
+                    test_tool_logger.error(
+                        "Index %s not found in list %s", list_key, log_path
+                    )
+                    value = variable
+                    break
+                log_path += f"[{list_key}]"
+
+        if changed == variable:
+            changed = value
         else:
-            # cast to string since we want to replace strings
-            val = str(val)
-            changed = changed.replace(origin, val)
-
+            changed = changed.replace(variable, str(value))
 
     if changed != to_change:
         test_tool_logger.debug("Changed value %s to %s.", to_change, changed)
