@@ -5,6 +5,12 @@ Changelog
 (unreleased)
 ------------
 - Feat: improve variable templating, dicts and lists. [Jakob Graf]
+
+
+0.1.17 (2024-03-20)
+-------------------
+- Release: version 0.1.17 🚀 [Jakob Graf]
+- Feat: improve variable templating, dicts and lists. [Jakob Graf]
 - Feat: improve variable templating, dicts and lists. [Jakob Graf]
 - Feat: add python plugin. [Jakob Graf]
 
