@@ -39,6 +39,7 @@ The tests are done in the following available plugins:
 - Assert (test_tool_assert_plugin)
 - Copy Files SSH (test_tool_copy_files_ssh_plugin)
 - JDBC SQL (test_tool_jdbc_sql_plugin)
+- Python (test_tool_python_plugin)
 - Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 - Rest (test_tool_rest_plugin)
 - Run Process (test_tool_run_process_plugin)
@@ -132,6 +133,21 @@ save:
 |   url   |   ${DB_URL}   |   The jdbc connection string   |
 |   username   |   ${DB_USERNAME}   |   The username of the db   |
 |   password   |   ${DB_PASSWORD}   |   The password of the db   |
+
+#### Python (test_tool_python_plugin)
+Run python code from calls.yaml
+
+##### Call:
+```yaml
+- type: PYTHON
+    call:
+        run: val='Hello World!'\nprint(val)
+```
+
+##### Parameters:
+| Parameter | Default | Description |
+|:---------:|:--------:|:--------:|
+|   run   |   val='Hello World!'\nprint(val)   |   The code to run.   |
 
 #### Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 Unpacks a jar file and parses and prints the manifest file to the logger. It also optionally saves a value.

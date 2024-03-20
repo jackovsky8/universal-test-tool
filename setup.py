@@ -22,6 +22,14 @@ def read(*paths, **kwargs):
 
 
 def read_requirements(path):
+    """
+    Read a requirements file.
+
+    Parameters:
+    ----------
+    path: str
+        The path to the requirements file
+    """
     return [
         line.strip()
         for line in read(path).split("\n")
@@ -45,6 +53,7 @@ setup(
             "test-tool-assert-plugin = test_tool_assert_plugin.__main__:main",
             "test-tool-copy-files-ssh-plugin = test_tool_copy_files_ssh_plugin.__main__:main",
             "test-tool-jdbc-sql-plugin = test_tool_jdbc_sql_plugin.__main__:main",
+            "test-tool-python-plugin = test_tool_python_plugin.__main__:main",
             "test-tool-read-jar-manifest-plugin = test_tool_read_jar_manifest_plugin.__main__:main",
             "test-tool-rest-plugin = test_tool_rest_plugin.__main__:main",
             "test-tool-run-process-plugin = test_tool_run_process_plugin.__main__:main",
