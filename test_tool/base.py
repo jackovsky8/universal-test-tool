@@ -146,14 +146,18 @@ def replace_string_variables(
     """
     changed: str = to_change
     for var, val in data.items():
-        # cast to string since we want to replace strings
-        val = str(val)
-
         # The string we want to search for
         origin: str = "${" + var + "}"
 
         # Check if the string contains the origin
-        changed = changed.replace(origin, val)
+        if not isinstance(val, str) and origin == changed:
+            changed = val
+            break
+        else:
+            # cast to string since we want to replace strings
+            val = str(val)
+            changed = changed.replace(origin, val)
+
 
     if changed != to_change:
         test_tool_logger.debug("Changed value %s to %s.", to_change, changed)
@@ -189,7 +193,7 @@ def recursively_replace_variables(
             changed_iteration = False
             if isinstance(to_change[key], dict):
                 changed_iteration = (
-                    recursively_replace_variables(value, data) is not None
+                    recursively_replace_variables(to_change[key], data) is not None
                 )
             elif isinstance(to_change[key], list):
                 for idx, val in enumerate(to_change[key]):
