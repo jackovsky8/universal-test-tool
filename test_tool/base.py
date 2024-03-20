@@ -153,7 +153,7 @@ def replace_string_variables(
     # Replace the variables with the data if they are in the data, otherwise leave them
     for variable in variables:
         # Remove ${ and }
-        var = variable[2:-1]
+        var = variable[2:-2]
         # Split for objects
         keys = var.split(".")
         # Check if path is list
