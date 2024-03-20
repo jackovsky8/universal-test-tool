@@ -4,6 +4,14 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: improve variable templating, dicts and lists. [Jakob Graf]
+- Feat: improve variable templating, dicts and lists. [Jakob Graf]
+- Feat: add python plugin. [Jakob Graf]
+
+
+0.1.16 (2024-03-20)
+-------------------
+- Release: version 0.1.16 🚀 [Jakob Graf]
 - Feat: glob for file upload. [Jakob Graf]
 - Feat: format assert plugin. [Jakob Graf]
 - Feat: replace also dicts and lists. [Jakob Graf]
