@@ -320,21 +320,26 @@ def run_tests(
         Path to the output folder.
     """
     project_path: Path = Path(project_path_str)
-    calls_path: Path = project_path.joinpath(calls_path_str)
-    data_path: Path = project_path.joinpath(data_path_str)
-
     test_tool_logger.info(
         "Running tests for project %s", project_path.as_posix()
     )
-    test_tool_logger.debug("Calls: %s", calls_path.relative_to(project_path))
-    test_tool_logger.debug("Data: %s", data_path.relative_to(project_path))
 
-    # Load the data
-    data: Dict[str, Any] = load_config_yaml(data_path)
-    if data is None:
+    calls_path: Path = project_path.joinpath(calls_path_str)
+    test_tool_logger.info("Calls: %s", calls_path.relative_to(project_path))
+
+    data_path: Path = project_path.joinpath(data_path_str)
+    if data_path.exists():
+        test_tool_logger.info("Data: %s", data_path.relative_to(project_path))
+
+        # Load the data
+        data: Dict[str, Any] = load_config_yaml(data_path)
+        if data is None:
+            data = {}
+        for key, value in data.items():
+            test_tool_logger.debug("Loaded %s for %s", value, key)
+    else:
+        test_tool_logger.info("No data file found, using empty data dict.")
         data = {}
-    for key, value in data.items():
-        test_tool_logger.debug("Loaded %s for %s", value, key)
 
     # Set the project path in the data
     data["PROJECT_PATH"] = project_path.as_posix()

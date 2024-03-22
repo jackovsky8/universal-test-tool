@@ -348,3 +348,27 @@ def test_run_tests() -> None:
     # Check if the output folder was created
     assert path.joinpath("output").exists()
     assert path.joinpath("output").is_dir()
+
+
+def test_run_tests_no_data() -> None:
+    """
+    Test the run_tests function.
+    """
+    path: Path = Path(tempfile.gettempdir()).joinpath("test_tool/config")
+    # remove the folder if it exists
+    rmtree(path, ignore_errors=True)
+    path.mkdir(exist_ok=True, parents=True)
+
+    test_config = [
+        {"type": "MOCK", "call": {}, "line": 1},
+        {"type": "MOCK", "call": {}, "line": 1},
+    ]
+    # write as yaml
+    with open(path.joinpath("config.yaml"), "w", encoding="UTF-8") as file:
+        file.write(yaml.dump(test_config))
+
+    run_tests(path.as_posix(), "config.yaml", "data.yaml", False, "output")
+
+    # Check if the output folder was created
+    assert path.joinpath("output").exists()
+    assert path.joinpath("output").is_dir()
