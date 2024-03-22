@@ -4,19 +4,13 @@ This module contains tests for the base module.
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List
-import yaml
 from shutil import rmtree
+from typing import Any, Dict, List
 
 import pytest
-from test_tool.base import (
-    Call,
-    CallType,
-    import_plugin,
-    load_config_yaml,
-    make_all_calls,
-    run_tests,
-)
+import yaml
+from test_tool.base import (Call, CallType, import_plugin, load_config_yaml,
+                            make_all_calls, run_tests)
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -151,7 +145,7 @@ def test_make_all_calls_stop_on_error() -> None:
 
         @staticmethod
         def make_mock_call(
-            *args, **kwargs
+            *args, **kwargs  # pylint: disable=unused-argument
         ) -> None:  # pylint: disable=unused-argument
             """
             A mock function for make_timing_call.
@@ -185,7 +179,7 @@ def test_make_all_calls_not_stop_on_error() -> None:
 
         @staticmethod
         def make_mock_call(
-            *args, **kwargs
+            *args, **kwargs  # pylint: disable=unused-argument
         ) -> None:  # pylint: disable=unused-argument
             """
             A mock function for make_timing_call.
