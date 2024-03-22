@@ -6,7 +6,7 @@ import re
 import tempfile
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict
+from typing import Any, Dict, List, TypedDict, Optional
 from urllib.request import urlretrieve
 
 from jaydebeapi import Cursor, connect  # type: ignore
@@ -158,7 +158,7 @@ def get_value_from_path(data: JdbcSqlResult, path: str) -> Any:
     return value
 
 
-def extract_result(cursor: Cursor) -> JdbcSqlResult | None:
+def extract_result(cursor: Cursor) -> Optional[JdbcSqlResult]:
     """
     This function will extract the result from the cursor.
     It will only return the result if it was an SELECT query.
@@ -170,10 +170,10 @@ def extract_result(cursor: Cursor) -> JdbcSqlResult | None:
 
     Returns:
     -------
-    DotDict | None
+    Optional[JdbcSqlResult]
         The result extracted from the cursor
     """
-    result: JdbcSqlResult | None = None
+    result: Optional[JdbcSqlResult] = None
     if cursor.description is not None:
         # Create the object to store the result
         rows: List[Dict[str, Any]] = []
@@ -219,7 +219,7 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
             query = call["query"]
             cursor.execute(query)
 
-            result: JdbcSqlResult | None = extract_result(cursor)
+            result: Optional[JdbcSqlResult] = extract_result(cursor)
 
             # Save some values
             if result is None and call["save"]:

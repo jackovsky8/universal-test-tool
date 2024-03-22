@@ -10,3 +10,5 @@ gitchangelog
 mkdocs
 mkdocs-material
 testcontainers
+setuptools
+types-setuptools
