@@ -41,7 +41,7 @@ The tests are done in the following available plugins:
 
 - Assert (test_tool_assert_plugin)
 - Copy Files SSH (test_tool_copy_files_ssh_plugin)
-- JDBC SQL (test_tool_jdbc_sql_plugin)
+- [jdbc SQL (test_tool_jdbc_sql_plugin)](docs/plugins/jdbc_sql.md)
 - Python (test_tool_python_plugin)
 - Read Jar Manifest (test_tool_read_jar_manifest_plugin)
 - Rest (test_tool_rest_plugin)
@@ -101,56 +101,6 @@ Copies files and folders between local machine and remote machine via ssh.
 | local_path  |          None           |                        The local file or folder for the transfer.                        |
 | remote_path |          None           |                       The remote file or folder for the transfer.                        |
 |  download   |          False          | If this flag is set to true, the file transfer is a download, otherwise it is an upload. |
-
-#### JDBC SQL (test_tool_jdbc_sql_plugin)
-
-Runs SQL Statements with [JayDeBeApi](https://pypi.org/project/JayDeBeApi/).
-
-##### Call:
-
-```yaml
-- type: JDBC_SQL
-    call:
-        query: None
-        save: []
-        validate: []
-        driver: "{{DB_DRIVER}}"
-        driver_path: "{{DB_DRIVER_PATH}}"
-        driver_url: "{{DB_DRIVER_URL}}"
-        url: "{{DB_URL}}"
-        username: "{{DB_USERNAME}}"
-        password: "{{DB_PASSWORD}}"
-```
-
-Object for save:
-
-```yaml
-save:
-  path: "."
-  to: None
-```
-
-Object for validate:
-
-```yaml
-validate:
-  path: "."
-  expected: None
-```
-
-##### Parameters:
-
-|  Parameter  |      Default       |             Description              |
-| :---------: | :----------------: | :----------------------------------: |
-|    query    |        None        |       The SQL statement to run       |
-|    save     |         []         | Save a entry of a cell to a variable |
-|   vaidate   |         []         |     Validate the entry of a cell     |
-|   driver    |   {{DB_DRIVER}}    |       The Class of the driver        |
-| driver_path | {{DB_DRIVER_PATH}} |       The Path of the jar file       |
-| driver_url  | {{DB_DRIVER_URL}}  |   The Url to download the jar file   |
-|     url     |     {{DB_URL}}     |      The jdbc connection string      |
-|  username   |  {{DB_USERNAME}}   |        The username of the db        |
-|  password   |  {{DB_PASSWORD}}   |        The password of the db        |
 
 #### Python (test_tool_python_plugin)
 
