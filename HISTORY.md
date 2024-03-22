@@ -4,6 +4,22 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: format base tests. [Jakob Graf]
+- Feat: nor require data file. [Jakob Graf]
+- Feat: restructure readme. [Jakob Graf]
+- Feat: restructure readme. [Jakob Graf]
+- Feat: formatting the code. [Jakob Graf]
+- Feat: formatting the code. [Jakob Graf]
+- Feat: improve and test base script. [Jakob Graf]
+- Feat: make jdbc sql mor robust. [Jakob Graf]
+- Aktualisieren von jekyll-gh-pages.yml. [Graf Jakob]
+- Feat: mkdocs instead of jekyll. [Graf Jakob]
+- Bug: typo in substitution.md. [Graf Jakob]
+
+
+0.1.20 (2024-03-20)
+-------------------
+- Release: version 0.1.20 🚀 [Jakob Graf]
 - Feat: improve substitution format. [Jakob Graf]
 - Feat: improve substitution ci tests. [Jakob Graf]
 - Feat: improve substitution ci tests. [Jakob Graf]
