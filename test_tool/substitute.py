@@ -41,7 +41,7 @@ def replace_string_variables(
     # Find all variables in the string. Variables are defined as {{foo.bar[0]}}
     pattern = r"{{[a-zA-Z0-9\_\-\.\[\]\|\:]+}}"
     variables = findall(pattern, changed)
-    # Replace the variables with the data if they are in the data, otherwise leave them
+    # Replace the variables with the data, if possible
     for variable in variables:
         # Remove {{ and }}
         var = variable[2:-2]

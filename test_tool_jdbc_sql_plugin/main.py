@@ -15,10 +15,10 @@ from jaydebeapi import Cursor, connect  # type: ignore
 test_tool_logger = getLogger("test-tool")
 
 default_jdbc_driver: Dict[str, str] = {
-    "org.postgresql.Driver":
-    "https://jdbc.postgresql.org/download/postgresql-42.7.3.jar",
-    "oracle.jdbc.OracleDriver":
-    "https://download.oracle.com/otn-pub/otn_software/jdbc/233/ojdbc11.jar",
+    "org.postgresql.Driver": "https://jdbc.postgresql.org/download"
+    + "/postgresql-42.7.3.jar",
+    "oracle.jdbc.OracleDriver": "https://download.oracle.com/otn-pub"
+    + "/otn_software/jdbc/233/ojdbc11.jar",
 }
 
 
@@ -130,19 +130,29 @@ def get_value_from_path(data: JdbcSqlResult, path: str) -> Any:
             value = value[key]
         except KeyError as e:
             test_tool_logger.error(
-                "Invalid path %s in data: %s does not contain %s", path, path_log, key)
+                "Invalid path %s in data: %s does not contain %s",
+                path,
+                path_log,
+                key,
+            )
             raise KeyError(
-                f"Invalid path {path} in data: {path_log} does not contain {key}") from e
+                f"Invalid path {path} in data: {path_log} "
+                + f"does not contain {key}"
+            ) from e
         path_log += f".{key}"
         if is_list:
             try:
                 value = value[int(idx)]
             except IndexError as e:
                 test_tool_logger.error(
-                    "Invalid path %s in data: List %s does not contain idx %s", path,
-                    path_log, idx)
+                    "Invalid path %s in data: List %s does not contain idx %s",
+                    path,
+                    path_log,
+                    idx,
+                )
                 raise IndexError(
-                    f"Invalid path {path} in data. List {path_log} does not contain idx {idx}"
+                    f"Invalid path {path} in data. List {path_log} "
+                    + f"does not contain idx {idx}"
                 ) from e
             path_log += f"[{idx}]"
     return value
@@ -167,8 +177,7 @@ def extract_result(cursor: Cursor) -> JdbcSqlResult | None:
     if cursor.description is not None:
         # Create the object to store the result
         rows: List[Dict[str, Any]] = []
-        header = [str(column[0]).lower()
-                  for column in cursor.description]
+        header = [str(column[0]).lower() for column in cursor.description]
 
         fetched_rows = cursor.fetchall()
         for row in fetched_rows:
@@ -193,11 +202,12 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
     data: Dict
         The data that was passed to the function
     """
-    test_tool_logger.info('Run query: %s', call["query"])
+    test_tool_logger.info("Run query: %s", call["query"])
 
     # Establish the database connection
     test_tool_logger.debug(
-        'Connect to %s with driver %s', call["url"], call["driver"])
+        "Connect to %s with driver %s", call["url"], call["driver"]
+    )
     with connect(
         call["driver"],
         call["url"],
@@ -218,7 +228,8 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
             elif result is not None:
                 for save in call["save"]:
                     data[save["to"]] = get_value_from_path(
-                        result, save["path"])
+                        result, save["path"]
+                    )
 
             # Validate some values
             if result is None and call["validate"]:
@@ -227,8 +238,10 @@ def make_jdbc_sql_call(call: JdbcSqlCall, data: Dict[str, Any]) -> None:
             elif result is not None:
                 for validate in call["validate"]:
                     value = get_value_from_path(result, validate["path"])
-                    assert value == validate["expected"], \
-                        f"Value of {validate['path']}: {value} != {validate['expected']}"
+                    assert value == validate["expected"], (
+                        f"Value of {validate['path']}: "
+                        + f"{value} != {validate['expected']}"
+                    )
 
 
 def augment_jdbc_sql_call(
@@ -249,11 +262,21 @@ def augment_jdbc_sql_call(
         The path of the file
     """
     # Check db parameters
-    db_parameters: List[str] = ["url", "username",
-                                "password", "driver", "driver_path", "driver_url"]
+    db_parameters: List[str] = [
+        "url",
+        "username",
+        "password",
+        "driver",
+        "driver_path",
+        "driver_url",
+    ]
     # Define the required parameters
-    db_parameters_required: List[str] = ["url", "username",
-                                         "password", "driver"]
+    db_parameters_required: List[str] = [
+        "url",
+        "username",
+        "password",
+        "driver",
+    ]
 
     for parameter in db_parameters:
         env_parameter = f"DB_{parameter.upper()}"
@@ -261,18 +284,26 @@ def augment_jdbc_sql_call(
             call[parameter] = data[env_parameter]  # type: ignore
         if call[parameter] is None:  # type: ignore
             call[parameter] = os.getenv(env_parameter)  # type: ignore
-        if call[parameter] is None and parameter in db_parameters_required:  # type: ignore
+        if (
+            call[parameter] is None  # type: ignore
+            and parameter in db_parameters_required
+        ):
             test_tool_logger.error(
-                "Env or data %s not provided", env_parameter)
+                "Env or data %s not provided", env_parameter
+            )
             raise KeyError(f"Env or data {env_parameter} not provided")
 
     if call["driver_path"] is None:
         if call["driver_url"] is None:
             if call["driver"] not in default_jdbc_driver:
                 test_tool_logger.error(
-                    "Driver url or driver path not provided for driver %s", call["driver"])
+                    "Driver url or driver path not provided for driver %s",
+                    call["driver"],
+                )
                 raise KeyError(
-                    f"Driver url or driver path not provided for driver {call['driver']}")
+                    "Driver url or driver path not provided for driver "
+                    + call["driver"]
+                )
             else:
                 call["driver_url"] = default_jdbc_driver[call["driver"]]
 
@@ -296,14 +327,17 @@ def augment_jdbc_sql_call(
         raise ValueError("Missing mandatory parameter query")
 
     # Validate path for save and validate
-    new_list = call.get("save", []) + call.get("validate", [])
+    new_list = call.get("save", []) + call.get("validate", [])  # type: ignore
     for el in new_list:
         path_string: str = el["path"]
-        pattern: str = r"^\.(rows(\[\d*\](\.[a-zA-Z0-9_]*)?)?|header(\[\d*\])?)$"
+        pattern: str = (
+            r"^\.(rows(\[\d*\](\.[a-zA-Z0-9_]*)?)?|header(\[\d*\])?)$"
+        )
         # validate path
         if not re.match(pattern, path_string):
             test_tool_logger.error(
-                "Parameter path is invalid: %s", path_string)
+                "Parameter path is invalid: %s", path_string
+            )
             raise ValueError(f"Parameter path is invalid: {path_string}")
 
 

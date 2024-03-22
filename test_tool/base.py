@@ -14,8 +14,9 @@ from traceback import print_exception
 from types import FunctionType
 from typing import Any, Callable, Dict, List, TypedDict
 
-from test_tool import recursively_replace_variables
 from yaml import YAMLError, safe_load
+
+from test_tool import recursively_replace_variables
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")
@@ -103,13 +104,15 @@ def import_plugin(plugin: str, loaded_call_types: Dict[str, CallType]) -> bool:
                 plugin_module, component
             )
         except AttributeError:
-            # We can ignore this error, because the default value is already set
+            # We can ignore this error, because default value is set
             pass
         if not isinstance(
             loaded_plugin[key], PLUGIN_COMPONENT_TYPES[key]  # type: ignore
         ):
-            msg: str = f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, " + \
-                f"{component} is not a {PLUGIN_COMPONENT_TYPES[key]}"
+            msg: str = (
+                f"Module test_tool_{plugin.lower()}_plugin is not a valid "
+                + f"plugin, {component} is not a {PLUGIN_COMPONENT_TYPES[key]}"
+            )
             test_tool_logger.error(msg)
             raise AttributeError(msg)
 
@@ -120,8 +123,8 @@ def import_plugin(plugin: str, loaded_call_types: Dict[str, CallType]) -> bool:
 def make_all_calls(
     calls: List[Call],
     data: Dict[str, Any],
-    path: Path,  # pylint: disable=unused-argument # could be used for dynamic args
-    continue_on_failure: bool
+    path: Path,  # pylint: disable=unused-argument
+    continue_on_failure: bool,
 ) -> int:
     """
     Make all calls.
@@ -153,9 +156,10 @@ def make_all_calls(
             test_tool_logger.error("Stopping on first error")
             break
 
-        if not "type" in test:
+        if "type" not in test:
             test_tool_logger.error(
-                "No type specified for test from line %s using assert plugin", test["line"]
+                "No type specified for test from line %s using assert plugin",
+                test["line"],
             )
             test["type"] = "ASSERT"
 
@@ -204,7 +208,8 @@ def make_all_calls(
                 )
                 # Augment the call with the data from the config
                 args: List[str] = getfullargspec(
-                    loaded_call_types[test["type"]]["augment_call"])[0]
+                    loaded_call_types[test["type"]]["augment_call"]
+                )[0]
                 call_args: Dict[str, Any] = {}
                 allowed_args: List[str] = ["call", "data", "path"]
                 for arg in args:
@@ -213,7 +218,8 @@ def make_all_calls(
                 loaded_call_types[test["type"]]["augment_call"](**call_args)
                 # Make the call
                 args = getfullargspec(
-                    loaded_call_types[test["type"]]["make_call"])[0]
+                    loaded_call_types[test["type"]]["make_call"]
+                )[0]
                 call_args = {}
                 allowed_args = ["call", "data"]
                 for arg in args:
@@ -222,7 +228,9 @@ def make_all_calls(
                 loaded_call_types[test["type"]]["make_call"](**call_args)
             except AssertionError as e:
                 test_tool_logger.error(
-                    "Assertion error for test from line %s: %s", test["line"], e
+                    "Assertion error for test from line %s: %s",
+                    test["line"],
+                    e,
                 )
                 errors += 1
                 error = True

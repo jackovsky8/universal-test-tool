@@ -8,12 +8,15 @@ from typing import Dict
 
 import pytest
 from jaydebeapi import DatabaseError  # type: ignore
-from test_tool_jdbc_sql_plugin.main import (JdbcSqlCall,
-                                            JdbcSqlResult,
-                                            augment_jdbc_sql_call,
-                                            default_jdbc_sql_call,
-                                            get_value_from_path,
-                                            make_jdbc_sql_call)
+from test_tool_jdbc_sql_plugin.main import (
+    JdbcSqlCall,
+    JdbcSqlResult,
+    augment_jdbc_sql_call,
+    default_jdbc_sql_call,
+    get_value_from_path,
+    make_jdbc_sql_call,
+)
+
 # pylint: disable-next=F0401
 from testcontainers.postgres import PostgresContainer  # type: ignore
 
@@ -149,7 +152,8 @@ def test_wrong_syntax() -> None:
         make_jdbc_sql_call(call, data)
 
     assert 'ERROR: syntax error at or near "id"\n  Position: 27' in str(
-        excinfo.value.args[0].args[0])
+        excinfo.value.args[0].args[0]
+    )
 
 
 def test_invalid_path() -> None:
@@ -166,7 +170,8 @@ def test_invalid_path() -> None:
         augment_jdbc_sql_call(call, data, Path(__file__))
 
     assert "Parameter path is invalid: rows[0].name" in str(
-        excinfo.value.args[0])
+        excinfo.value.args[0]
+    )
 
 
 def test_missing_query() -> None:
@@ -187,8 +192,7 @@ def test_get_value_from_path_existing() -> None:
     """
     Test for getting a value from a path that exists.
     """
-    data: JdbcSqlResult = {
-        "rows": [{"name": "test1"}], "header": ["name"]}
+    data: JdbcSqlResult = {"rows": [{"name": "test1"}], "header": ["name"]}
 
     assert get_value_from_path(data, ".rows[0].name") == "test1"
 
@@ -197,10 +201,12 @@ def test_get_value_from_path_not_existing() -> None:
     """
     Test for getting a value from a path that does not exist.
     """
-    data: JdbcSqlResult = {
-        "rows": [{"name": "test1"}], "header": ["name"]}
+    data: JdbcSqlResult = {"rows": [{"name": "test1"}], "header": ["name"]}
 
     with pytest.raises(KeyError) as excinfo:
         get_value_from_path(data, ".rows[0].names")
 
-    assert excinfo.value.args[0] == "Invalid path .rows[0].names in data: .rows[0] does not contain names"
+    assert (
+        excinfo.value.args[0]
+        == "Invalid path .rows[0].names in data: .rows[0] does not contain names"
+    )
