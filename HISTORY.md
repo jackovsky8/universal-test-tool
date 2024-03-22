@@ -4,6 +4,12 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: minor bug fixes. [Jakob Graf]
+
+
+0.1.21 (2024-03-22)
+-------------------
+- Release: version 0.1.21 🚀 [Jakob Graf]
 - Feat: format base tests. [Jakob Graf]
 - Feat: nor require data file. [Jakob Graf]
 - Feat: restructure readme. [Jakob Graf]
