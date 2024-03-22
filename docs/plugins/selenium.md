@@ -1,8 +1,14 @@
-#### Selenium (test_tool_selenium_plugin)
+# Selenium
 
-Start a webbrowser and run tests via [selenium](https://selenium-python.readthedocs.io/).
+This plugin is used to start a webbrowser and run tests via [selenium](https://selenium-python.readthedocs.io/).
 
-##### Call:
+## Features
+
+The most features from selenium. We will sooon have a better expliaination here.
+
+## Calls
+
+The call looks like:
 
 ```yaml
 - type: SELENIUM
@@ -15,7 +21,7 @@ Start a webbrowser and run tests via [selenium](https://selenium-python.readthed
         option: {}
 ```
 
-Object for action:
+The object for action looks like:
 
 ```yaml
 action: None
@@ -24,7 +30,9 @@ actions: None
 log: None
 ```
 
-##### Parameters:
+The object for action can contain itself recursively.
+
+### Parameters:
 
 | Parameter |      Default      |                                                    Description                                                     |
 | :-------: | :---------------: | :----------------------------------------------------------------------------------------------------------------: |
