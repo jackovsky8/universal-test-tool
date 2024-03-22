@@ -12,3 +12,4 @@ requests
 types-requests
 selenium
 webdriver_manager
+pyyaml

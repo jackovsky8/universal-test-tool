@@ -7,15 +7,15 @@ import sys
 from copy import deepcopy
 from datetime import datetime
 from importlib import import_module
+from inspect import getfullargspec
 from logging import DEBUG, INFO, FileHandler, Formatter, getLogger
 from pathlib import Path
 from traceback import print_exception
 from types import FunctionType
 from typing import Any, Callable, Dict, List, TypedDict
 
-from yaml import YAMLError, safe_load
-
 from test_tool import recursively_replace_variables
+from yaml import YAMLError, safe_load
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")
@@ -29,10 +29,6 @@ class CallType(TypedDict):
     default_call: Dict[str, Any]
     augment_call: Callable
     make_call: Callable
-
-
-# Loaded Plugins
-LOADED_CALL_TYPES: Dict[str, CallType] = dict()
 
 
 class Call(TypedDict):
@@ -62,7 +58,7 @@ PLUGIN_COMPONENT_TYPES: Dict[str, type] = {
 }
 
 
-def import_plugin(plugin: str) -> bool:
+def import_plugin(plugin: str, loaded_call_types: Dict[str, CallType]) -> bool:
     """
     Dynamically import the specified plugin as a module.
 
@@ -92,8 +88,8 @@ def import_plugin(plugin: str) -> bool:
     # Create a dict for the loaded plugin
     loaded_plugin: CallType = {
         "default_call": {},
-        "augment_call": lambda x: x,
-        "make_call": lambda x: x,
+        "augment_call": lambda *args, **kwargs: None,
+        "make_call": lambda *args, **kwargs: None,
     }
 
     # Load the components from the plugin
@@ -101,36 +97,31 @@ def import_plugin(plugin: str) -> bool:
         key: val.replace("${plugin}", plugin.lower())
         for key, val in PLUGIN_TEMPLATE.items()
     }
-    try:
-        for key, component in to_load.items():
+    for key, component in to_load.items():
+        try:
             loaded_plugin[key] = getattr(  # type: ignore
                 plugin_module, component
             )
-            if not isinstance(
-                loaded_plugin[key], PLUGIN_COMPONENT_TYPES[key]  # type: ignore
-            ):
-                test_tool_logger.error(
-                    "Module test_tool_%s_plugin is not a valid plugin, %s is"
-                    + " not a %s",
-                    plugin.lower(),
-                    component,
-                    PLUGIN_COMPONENT_TYPES[key],
-                )
-                return False
-    except AttributeError:
-        test_tool_logger.error(
-            "Module test_tool_%s_plugin is not a valid plugin, missing a"
-            + " component.",
-            plugin.lower(),
-        )
-        return False
+        except AttributeError:
+            # We can ignore this error, because the default value is already set
+            pass
+        if not isinstance(
+            loaded_plugin[key], PLUGIN_COMPONENT_TYPES[key]  # type: ignore
+        ):
+            msg: str = f"Module test_tool_{plugin.lower()}_plugin is not a valid plugin, " + \
+                f"{component} is not a {PLUGIN_COMPONENT_TYPES[key]}"
+            test_tool_logger.error(msg)
+            raise AttributeError(msg)
 
-    LOADED_CALL_TYPES[plugin] = loaded_plugin
+    loaded_call_types[plugin] = loaded_plugin
     return True
 
 
 def make_all_calls(
-    calls: List[Call], data: Dict[str, Any], path: Path, continue_tests
+    calls: List[Call],
+    data: Dict[str, Any],
+    path: Path,  # pylint: disable=unused-argument # could be used for dynamic args
+    continue_on_failure: bool
 ) -> int:
     """
     Make all calls.
@@ -143,7 +134,7 @@ def make_all_calls(
         Data to use for the calls.
     path : Path
         Path to the project.
-    continue_tests : bool
+    continue_on_failure : bool
         Continue tests on error.
 
     Returns
@@ -152,77 +143,101 @@ def make_all_calls(
         Number of errors.
     """
     errors: int = 0
+    # Loaded Plugins
+    loaded_call_types: Dict[str, CallType] = dict()
 
     # Make the calls and check the response
     for idx, test in enumerate(calls):
-        # Check if call type is defined
-        try:
-            test["type"]
-        except KeyError:
-            test_tool_logger.debug("No call type defined, using default: REST")
-            test["type"] = "REST"
-
-        # Determine if the call type is loaded
-        try:
-            LOADED_CALL_TYPES[test["type"]]
-        except KeyError:
-            # Module is not loaded yet, load it
-            test_tool_logger.debug(
-                "Loading plugin for call type %s", test["type"]
-            )
-            if not import_plugin(test["type"]):
-                test_tool_logger.error(
-                    "%s call is not supported", test["type"]
-                )
-                errors += 1
-                continue
-
-        # Merge the default call with the call from the config
-        default_call = deepcopy(
-            LOADED_CALL_TYPES[test["type"]]["default_call"]
-        )
-        try:
-            call = {**default_call, **test["call"]}
-        except KeyError as e:
-            if "'call'" == str(e):
-                call = default_call
-            else:
-                test_tool_logger.error("Key %s not found in call", e)
-                errors += 1
-                continue
-
-        # Recursivly replace variables in call with data
-        recursively_replace_variables(call, data)
-
-        # Call the funktion
-        try:
-            test_tool_logger.info(
-                "Make call %s in %s plugin.", idx + 1, test["type"]
-            )
-            # Augment the call with the data from the config
-            LOADED_CALL_TYPES[test["type"]]["augment_call"](call, data, path)
-            # Make the call
-            LOADED_CALL_TYPES[test["type"]]["make_call"](call, data)
-        except AssertionError as e:
-            test_tool_logger.error(
-                "Assertion error for test from line %s: %s", test["line"], e
-            )
-            errors += 1
-        except Exception as e:  # pylint: disable=broad-except
-            test_tool_logger.error(
-                'Exception "%s" occured for test from line %s '
-                + "(This might be a problem with the plugin or config).",
-                e,
-                test["line"],
-            )
-            # if debug:
-            if test_tool_logger.getEffectiveLevel() == DEBUG:
-                print_exception(type(e), e, e.__traceback__)
-            errors += 1
-
-        if errors > 0 and not continue_tests:
+        # Stopping on first error
+        if errors > 0 and not continue_on_failure:
             test_tool_logger.error("Stopping on first error")
             break
+
+        if not "type" in test:
+            test_tool_logger.error(
+                "No type specified for test from line %s using assert plugin", test["line"]
+            )
+            test["type"] = "ASSERT"
+
+        # Atomic error handling
+        error = False
+
+        # Make sure the plugin is loaded
+        if not error:
+            if not test["type"] in loaded_call_types:
+                test_tool_logger.debug(
+                    "Loading plugin for call type %s", test["type"]
+                )
+                if not import_plugin(test["type"], loaded_call_types):
+                    test_tool_logger.error(
+                        "%s call is not supported", test["type"]
+                    )
+                    errors += 1
+                    error = True
+
+        # Merge the default call with the call from the config
+        if not error:
+            default_call = deepcopy(
+                loaded_call_types[test["type"]]["default_call"]
+            )
+            try:
+                call = {**default_call, **test["call"]}
+            except KeyError:
+                call = default_call
+
+        # Recursivly replace variables in call with data
+        if not error:
+            try:
+                recursively_replace_variables(call, data)
+            except (KeyError, ValueError) as e:
+                # if debug is enabled print the exception
+                if test_tool_logger.getEffectiveLevel() == DEBUG:
+                    print_exception(type(e), e, e.__traceback__)
+                errors += 1
+                error = True
+
+        # Call the funktion
+        if not error:
+            try:
+                test_tool_logger.info(
+                    "Make call %s in %s plugin.", idx + 1, test["type"]
+                )
+                # Augment the call with the data from the config
+                args: List[str] = getfullargspec(
+                    loaded_call_types[test["type"]]["augment_call"])[0]
+                call_args: Dict[str, Any] = {}
+                allowed_args: List[str] = ["call", "data", "path"]
+                for arg in args:
+                    if arg in allowed_args:
+                        call_args[arg] = locals()[arg]
+                loaded_call_types[test["type"]]["augment_call"](**call_args)
+                # Make the call
+                args = getfullargspec(
+                    loaded_call_types[test["type"]]["make_call"])[0]
+                call_args = {}
+                allowed_args = ["call", "data"]
+                for arg in args:
+                    if arg in allowed_args:
+                        call_args[arg] = locals()[arg]
+                loaded_call_types[test["type"]]["make_call"](**call_args)
+            except AssertionError as e:
+                test_tool_logger.error(
+                    "Assertion error for test from line %s: %s", test["line"], e
+                )
+                errors += 1
+                error = True
+            except Exception as e:  # pylint: disable=broad-except
+                test_tool_logger.error(
+                    'Exception "%s" occured for test from line %s '
+                    + "(This might be a problem with the plugin or config).",
+                    e,
+                    test["line"],
+                )
+                # if debug is enabled print the exception
+                if test_tool_logger.getEffectiveLevel() == DEBUG:
+                    print_exception(type(e), e, e.__traceback__)
+                errors += 1
+                error = True
 
     return errors
 
@@ -277,7 +292,7 @@ def run_tests(
     project_path_str: str,
     calls_path_str: str,
     data_path_str: str,
-    continue_tests: bool,
+    continue_on_failure: bool,
     output: str,
 ) -> None:
     """
@@ -291,7 +306,7 @@ def run_tests(
         Path to the calls config.
     data_path_str : str
         Path to the data config.
-    continue_tests : bool
+    continue_on_failure : bool
         Continue tests on error.
     output : str
         Path to the output folder.
@@ -339,11 +354,10 @@ def run_tests(
 
     # Load the calls
     calls: List[Call] = load_config_yaml(calls_path, True)
-    errors = make_all_calls(calls, data, project_path, continue_tests)
+    errors = make_all_calls(calls, data, project_path, continue_on_failure)
 
     if errors == 0:
         test_tool_logger.info("Everything OK")
-        sys.exit(0)
     else:
         test_tool_logger.error(
             "There occured %s test_tool_logger.errors while testing,"
