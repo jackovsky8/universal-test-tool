@@ -125,6 +125,22 @@ def test_retrieve_and_validate_one_row() -> None:
     make_jdbc_sql_call(call, data)
 
 
+def test_retrieve_with_multiline_query() -> None:
+    """
+    Test to retrieve and save one row.
+    """
+    call: JdbcSqlCall = deepcopy(default_jdbc_sql_call)
+    call["query"] = "SELECT *\n FROM test WHERE id = 1"
+    call["save"] = [{"path": ".rows[0].name", "to": "name"}]
+
+    data: Dict = {}
+
+    augment_jdbc_sql_call(call, data, Path(__file__))
+    make_jdbc_sql_call(call, data)
+
+    assert data["name"] == "test1"
+
+
 def test_insert_one_row() -> None:
     """
     Test to insert one row.

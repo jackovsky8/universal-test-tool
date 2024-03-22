@@ -170,7 +170,7 @@ default_rest_call: RestCall = {
     # Special
     "timeout": 0,
     "headers": {},
-    "verify": False,
+    "verify": True,
     "cert": None,
     # Verification
     "response_type": "JSON",  # type: ignore

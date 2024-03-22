@@ -200,11 +200,11 @@ def make_all_calls(
                 errors += 1
                 error = True
 
-        # Call the funktion
+        # Call the augmenting function
         if not error:
             try:
                 test_tool_logger.info(
-                    "Make call %s in %s plugin.", idx + 1, test["type"]
+                    "Augment %s in %s plugin.", idx + 1, test["type"]
                 )
                 # Augment the call with the data from the config
                 args: List[str] = getfullargspec(
@@ -216,6 +216,44 @@ def make_all_calls(
                     if arg in allowed_args:
                         call_args[arg] = locals()[arg]
                 loaded_call_types[test["type"]]["augment_call"](**call_args)
+            except AssertionError as e:
+                test_tool_logger.error(
+                    "Assertion error for test from line %s: %s",
+                    test["line"],
+                    e,
+                )
+                errors += 1
+                error = True
+            except Exception as e:  # pylint: disable=broad-except
+                test_tool_logger.error(
+                    'Exception "%s" occured for test from line %s '
+                    + "(This might be a problem with the plugin or config).",
+                    e,
+                    test["line"],
+                )
+                # if debug is enabled print the exception
+                if test_tool_logger.getEffectiveLevel() == DEBUG:
+                    print_exception(type(e), e, e.__traceback__)
+                errors += 1
+                error = True
+
+        # Recursivly replace variables in call with data
+        if not error:
+            try:
+                recursively_replace_variables(call, data)
+            except (KeyError, ValueError) as e:
+                # if debug is enabled print the exception
+                if test_tool_logger.getEffectiveLevel() == DEBUG:
+                    print_exception(type(e), e, e.__traceback__)
+                errors += 1
+                error = True
+
+        # Call the augmenting funktion
+        if not error:
+            try:
+                test_tool_logger.info(
+                    "Make call %s in %s plugin.", idx + 1, test["type"]
+                )
                 # Make the call
                 args = getfullargspec(
                     loaded_call_types[test["type"]]["make_call"]
@@ -355,7 +393,7 @@ def run_tests(
         output_path.mkdir(parents=True, exist_ok=True)
 
         # Set the output path in the data
-        data["OUTPUT_PATH"] = output_path.as_posix()
+        data["OUTPUT_PATH"] = output_path.absolute().as_posix()
 
         # Add Handler to logger to write to file
         fh = FileHandler(output_path.joinpath("run.log"))
