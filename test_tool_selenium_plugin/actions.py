@@ -232,43 +232,16 @@ def get_set_or_call_attribute(
         return call_callable_with_args(attribute_of_clazz, args)
     else:
         # Get attribute
-        if len(args) == 0:
+        if args is None:
             return getattr(clazz, attribute)
         # Set attribute
         else:
-            if isinstance(attribute_of_clazz, bool):
-                if not len(args) == 1 or not isinstance(args[0], bool):
-                    raise ValueError(
-                        f"Option {attribute} is a boolean, but arg isn't."
-                    )
-                else:
-                    setattr(clazz, attribute, args[0])
-            elif isinstance(attribute_of_clazz, str):
-                if not len(args) == 1 or not isinstance(args[0], str):
-                    raise ValueError(
-                        f"Option {attribute} is a string, but arg isn't."
-                    )
-                else:
-                    setattr(clazz, attribute, args[0])
-            elif isinstance(attribute_of_clazz, int):
-                if not len(args) == 1 or not isinstance(args[0], int):
-                    raise ValueError(
-                        f"Option {attribute} is an integer, but arg isn't."
-                    )
-                else:
-                    setattr(clazz, attribute, args[0])
-            elif isinstance(attribute_of_clazz, float):
-                if not len(args) == 1 or not isinstance(args[0], float):
-                    raise ValueError(
-                        f"Option {attribute} is a float, but arg isn't."
-                    )
-                else:
-                    setattr(clazz, attribute, args[0])
-            else:
-                # Setter no implemented for other values
-                raise NotImplementedError(
-                    f"Option {attribute} is of type {type(attribute_of_clazz)}."
+            if type(attribute_of_clazz) != type(args):  # pylint: disable=unidiomatic-typecheck
+                raise ValueError(
+                    f"Type of attribute {attribute} is {type(attribute_of_clazz)}, but type of arg is {type(args)}."
                 )
+            else:
+                setattr(clazz, attribute, args)
 
     return clazz
 
