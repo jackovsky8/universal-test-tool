@@ -9,8 +9,14 @@ from typing import Any, Dict, List
 
 import pytest
 import yaml
-from test_tool.base import (Call, CallType, import_plugin, load_config_yaml,
-                            make_all_calls, run_tests)
+from test_tool.base import (
+    Call,
+    CallType,
+    import_plugin,
+    load_config_yaml,
+    make_all_calls,
+    run_tests,
+)
 
 
 @pytest.fixture(scope="function", autouse=True)

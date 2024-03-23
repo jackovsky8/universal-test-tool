@@ -18,6 +18,16 @@ def test_basic_string_substitution_in_string():
     assert replace_string_variables(string, data) == "This is a value"
 
 
+def test_basic_string_substitution_in_string_with_spaces():
+    """
+    Test basic string substitution.
+    """
+    data = {"var": "value"}
+    string = "This is a {{ var }}"
+
+    assert replace_string_variables(string, data) == "This is a value"
+
+
 def test_basic_int_substitution_in_string():
     """
     Test basic int substitution.

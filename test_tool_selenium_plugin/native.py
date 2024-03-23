@@ -1,10 +1,11 @@
 """
 This module contains the functions to run native webdriver functions.
 """
-from importlib import import_module
-from logging import getLogger
-from typing import Any, Callable, Dict
 import inspect
+from importlib import import_module
+from importlib.util import find_spec
+from logging import getLogger
+from typing import Any, Callable, Dict, Optional
 
 from test_tool import DotDict
 
@@ -14,6 +15,66 @@ __all__ = ["get_native_function", "get_native_argument"]
 test_tool_logger = getLogger("test-tool")
 
 stored_native_functions = DotDict({})
+
+
+class LazyLoadDict(object):
+    """
+    A wrapper class for the Selenium WebDriver native functions and arguments.
+    """
+
+    def __init__(self, path: str, parent: Optional["LazyLoadDict"] = None):
+        self.__path__ = path
+        self.__parent__ = parent
+        self.__data__: Dict[str, Any] = {}
+
+    def __hasattr__(self, name: str) -> bool:
+        return hasattr(self, name)
+
+    def __getattr__(self, name: str) -> Any:
+        if self.__data__.get('name') is None:
+            if module_exists(f"{self.__path__}.{name}"):
+                self.__data__[name] = LazyLoadDict(
+                    f"{self.__path__}.{name}", self)
+            elif self.__parent__:
+                return self.__parent__.__import_module__(f"{self.__path__}.{name}")
+            else:
+                raise ModuleNotFoundError(
+                    f"module {self.__path__}.{name} not found")
+
+        return self.__data__[name]
+
+    def __import_module__(self, name: str) -> Any:
+        names = name.removeprefix(f"{self.__path__}.").split(".")
+        required_name = names[1]
+        actual_module_name = names[0]
+
+        module = import_module(f"{self.__path__}.{actual_module_name}")
+        self.__data__[actual_module_name] = module
+        return getattr(self.__data__[actual_module_name], required_name)
+
+
+class Selenium(object):
+    """
+    A wrapper class for the Selenium WebDriver native functions and arguments.
+    """
+
+    webdriver: LazyLoadDict = LazyLoadDict('selenium.webdriver')
+
+
+def module_exists(module: str) -> bool:
+    """
+    Check if a module exists.
+
+    Parameters:
+    -----------
+    module: str
+        The module to check.
+    """
+    try:
+        find_spec(module)
+        return True
+    except ModuleNotFoundError:
+        return False
 
 
 def import_native(plugin: str, loaded_call_types: Dict) -> bool:

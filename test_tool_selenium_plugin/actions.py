@@ -4,10 +4,11 @@ This module contains the functions to get the arguments
 from enum import Enum
 from logging import getLogger
 from time import sleep
-from typing import Any, Callable, Dict, List, Optional, TypedDict, Union
+from typing import Any, Callable, Dict, List, Optional, TypedDict, Union, Tuple
+import re
 
-from test_tool_selenium_plugin.native import (get_native_argument,
-                                              get_native_function)
+from test_tool import DotDict
+from test_tool_selenium_plugin.native import Selenium, get_native_argument
 
 __all__ = ["ArgumentType", "SeleniumAction", "get_arguments", "run_action"]
 
@@ -15,7 +16,23 @@ __all__ = ["ArgumentType", "SeleniumAction", "get_arguments", "run_action"]
 test_tool_logger = getLogger("test-tool")
 
 # Type definition for arguments
-Arguments = List[Union[Dict[Any, Any], List[Any], str, int, float, bool]]
+Arguments = Optional[List[Union[Dict[Any, Any],
+                                List[Any], str, int, float, bool]]]
+
+PATTERN_PATH = r"^(((\.?[a-zA-Z0-9\_]+(\[\d+\])*)(\.[a-zA-Z0-9\_]+(\[\d+\])*)*)|\.)$"
+
+
+class Operator(Enum):
+    """
+    This class represents an operator.
+    """
+
+    EQUAL = "=="
+    NOT_EQUAL = "!="
+    LESS_THAN = "<"
+    LESS_THAN_OR_EQUAL = "<="
+    GREATER_THAN = ">"
+    GREATER_THAN_OR_EQUAL = ">="
 
 
 class ArgumentType(Enum):
@@ -30,7 +47,7 @@ class ArgumentType(Enum):
     LIST = "list"
     DICTIONARY = "dictionary"
     EVAL = "eval"
-    NATIVE = "native"
+    CONTEXT = "context"
     ACTION = "action"
 
 
@@ -41,79 +58,53 @@ class SeleniumAction(TypedDict):
 
     action: str
     args: Arguments
-    actions: Optional[List["SeleniumAction"]]
-    log: Optional[str]
+    actions: List["SeleniumAction"]
+    log: str
     # Since 3.11
     # actions: NotRequired[List["SeleniumAction"]]
     # log: NotRequired[str]
 
 
-def assert_equals(
-    reference: Any, given: Any, message: str = "Values should equal:"
-) -> None:
-    """Assert that the given and reference values are equal."""
-    assert (
-        reference == given
-    ), f"{message} Reference: {reference} Given: {given}"
-
-
-def assert_not_equals(
-    reference: Any, given: Any, message: str = "Values should not equal:"
-) -> None:
-    """Assert that the given and reference values are not equal."""
-    assert (
-        reference != given
-    ), f"{message} Reference: {reference} Given: {given}"
-
-
-def assert_true(given: Any, message: str = "Value should be true:") -> None:
-    """Assert that the given value is true."""
-    assert given, f"{message} Given: {given}"
-
-
-def assert_false(given: Any, message: str = "Value should be false:") -> None:
-    """Assert that the given value is false."""
-    assert not given, f"{message} Given: {given}"
-
-
-def assert_greater_than(
-    reference: Any, given: Any, message: str = "Value should be greater than:"
-) -> None:
-    """Assert that the given value is greater than the reference value."""
-    assert (
-        reference > given
-    ), f"{message} Reference: {reference} Given: {given}"
-
-
-def assert_greater_than_or_equals(
-    reference: Any,
+def assert_fn(
+    operator: str,
+    expected: Any,
     given: Any,
-    message: str = "Value should be greater or equal than:",
 ) -> None:
-    """Assert that the given value is greater than or equals the reference value."""
-    assert (
-        reference >= given
-    ), f"{message} Reference: {reference} Given: {given}"
+    """
+    Make an assertion with the given operator, expected and given values.
 
+    Parameters:
+    -----------
+    operator: str
+        The operator to use for the assertion.
+    expected: Any
+        The expected value.
+    given: Any
+        The given value.
 
-def assert_less_than(
-    reference: Any, given: Any, message: str = "Value should be less than:"
-) -> None:
-    """Assert that the given value is less than the reference value."""
-    assert (
-        reference < given
-    ), f"{message} Reference: {reference} Given: {given}"
+    Raises:
+    -------
+    ValueError
+        If the operator is not supported.
+    """
+    # Parse the operator
+    operator_enum: Operator = Operator(operator)
 
-
-def assert_less_than_or_equals(
-    reference: Any,
-    given: Any,
-    message: str = "Value should be less or equal than:",
-) -> None:
-    """Assert that the given value is less than or equals the reference value."""
-    assert (
-        reference <= given
-    ), f"{message} Reference: {reference} Given: {given}"
+    # Make the assertion
+    if operator_enum == Operator.EQUAL:
+        assert expected == given, f"Expected: {expected} != Given: {given}"
+    elif operator_enum == Operator.NOT_EQUAL:
+        assert expected != given, f"Expected: {expected} == Given: {given}"
+    elif operator_enum == Operator.LESS_THAN:
+        assert expected < given, f"Expected: {expected} >= Given: {given}"
+    elif operator_enum == Operator.LESS_THAN_OR_EQUAL:
+        assert expected <= given, f"Expected: {expected} > Given: {given}"
+    elif operator_enum == Operator.GREATER_THAN:
+        assert expected > given, f"Expected: {expected} <= Given: {given}"
+    elif operator_enum == Operator.GREATER_THAN_OR_EQUAL:
+        assert expected >= given, f"Expected: {expected} < Given: {given}"
+    else:
+        raise ValueError(f"Operator {operator} is not supported.")
 
 
 # Blacklist
@@ -123,17 +114,11 @@ BLACKLIST: List[str] = [
     "close",  # Close the current window
 ]
 
-ADD_ACTION: Dict[str, Any] = {
-    "sleep": sleep,
-    "assert_equals": assert_equals,
-    "assert_not_equals": assert_not_equals,
-    "assert_true": assert_true,
-    "assert_false": assert_false,
-    "assert_greater_than": assert_greater_than,
-    "assert_greater_than_or_equals": assert_greater_than_or_equals,
-    "assert_less_than": assert_less_than,
-    "assert_less_than_or_equals": assert_less_than_or_equals,
-}
+ARTIFICIAL_CONTEXT: DotDict = DotDict({
+    "assert": assert_fn,
+    "selenium": Selenium,
+    "sleep": sleep
+})
 
 
 def call_callable_with_args(
@@ -158,34 +143,45 @@ def call_callable_with_args(
         return call()
 
 
-def get_arguments(args: Any, element: Any) -> Arguments:
+def get_arguments(args: Any, context: Any) -> Arguments:
     """Get the arguments of an action.
 
     Parameters:
     -----------
     - args: Any
         The arguments.
-    - element: Any
-        The element.
+    - context: Any
+        The context.
 
     Returns:
-    The arguments.
+    --------
+    Arguments
+        The arguments.
     """
     # List of arguments
     result: Any = None
     # Native types
     if (
         isinstance(args, bool)
-        or isinstance(args, str)
         or isinstance(args, int)
         or isinstance(args, float)
     ):
         result = args
+    # Strings are treated as strings or native functions
+    elif isinstance(args, str):
+        if args.startswith("selenium.webdriver") or args.startswith("."):
+            tmp_context, action = get_new_context_and_action(context, args)
+            if action:
+                result = get_set_or_call_attribute(tmp_context, action)
+            else:
+                result = tmp_context
+        else:
+            result = args
     # Lists are treated as lists of arguments
-    # elif isinstance(args, list):
-    #     # TODO: recursive
-    #     for arg in args:
-    #         result.extend(get_arguments(arg, element))
+    elif isinstance(args, list):
+        result = []
+        for arg in args:
+            result.append(get_arguments(arg, context))
     # Dict can be everything
     elif isinstance(args, dict):
         arg_type = ArgumentType(args.get("type", None))
@@ -194,7 +190,7 @@ def get_arguments(args: Any, element: Any) -> Arguments:
         ):
             result = []
             for arg in args["value"]:
-                result.append(get_arguments(arg, element))
+                result.append(get_arguments(arg, context))
         elif arg_type in (
             ArgumentType.BOOLEAN,
             ArgumentType.STRING,
@@ -206,28 +202,35 @@ def get_arguments(args: Any, element: Any) -> Arguments:
         elif arg_type == ArgumentType.EVAL:
             result = eval(args["value"])  # pylint: disable=eval-used
         elif arg_type == ArgumentType.ACTION:
-            action: SeleniumAction = args["value"]
-            result = run_action(action, element)
-        elif arg_type == ArgumentType.NATIVE:
+            action: SeleniumAction = args["value"]  # type: ignore
+            result = run_action(action, context)  # type: ignore
+        elif arg_type == ArgumentType.CONTEXT:
             result = get_native_argument(args["value"])
 
     return result
 
 
 def get_set_or_call_attribute(
-    clazz: Any, attribute: str, args: Arguments
+    clazz: Any, attribute: str, args: Arguments = None
 ) -> Any:
     """Get, set or call an attribute of a class.
 
     Parameters:
-    - clazz: The class to get, set or call the attribute of.
-    - attribute: The attribute to get, set or call.
-    - args: The arguments to call the attribute with.
+    ----------
+    - clazz: Any
+        The class to get, set or call the attribute on.
+    - attribute: str
+        The attribute to get, set or call.
+    - args: Arguments
+        The arguments to call the attribute with.
 
     Returns:
-    The result of the attribute.
+    --------
+    Any
+        The result of the action.
     """
     attribute_of_clazz = getattr(clazz, attribute)
+    # We call if it is a function
     if callable(attribute_of_clazz):
         return call_callable_with_args(attribute_of_clazz, args)
     else:
@@ -236,9 +239,12 @@ def get_set_or_call_attribute(
             return getattr(clazz, attribute)
         # Set attribute
         else:
-            if type(attribute_of_clazz) != type(args):  # pylint: disable=unidiomatic-typecheck
+            # pylint: disable-next=unidiomatic-typecheck
+            if type(attribute_of_clazz) != type(args):
                 raise ValueError(
-                    f"Type of attribute {attribute} is {type(attribute_of_clazz)}, but type of arg is {type(args)}."
+                    f"Type of attribute {attribute} is "
+                    + f"{type(attribute_of_clazz)}, " +
+                    f"but type of arg is {type(args)}."
                 )
             else:
                 setattr(clazz, attribute, args)
@@ -246,48 +252,91 @@ def get_set_or_call_attribute(
     return clazz
 
 
-def run_action(action: SeleniumAction, element: Any) -> Any:
-    """Run an action.
+def get_new_context_and_action(context: Any, path: str) -> Tuple[Any, str]:
+    """Get the new context of an action.
 
     Parameters:
-    - action: The action to run.
-    - element: The element to run the action on.
+    ----------
+    - context: Any
+        The context to get the new context from.
+    - path: str
+        The path to the new context.
 
     Returns:
-    The result of the action.
+    --------
+    Tuple[Any, str]
+        The new context and the action.
+    """
+    # Validate with regex
+    if not re.match(PATTERN_PATH, path):
+        raise ValueError(f"Path {path} is not valid.")
+
+    # Split the action into parts
+    path_parts = path.split(".")
+
+    # Remove empty parts, except the first one
+    path_parts = [part for idx,  part in enumerate(
+        path_parts) if part or idx == 0]
+
+    # Check if list is empty
+    if not path_parts:
+        raise ValueError(f"Path {path} is not valid.")
+
+    # Navigate to the previous part
+    if path_parts[0]:
+        tmp_context = ARTIFICIAL_CONTEXT
+    else:
+        tmp_context = context
+        if len(path_parts) > 1:
+            path_parts = path_parts[1:]
+
+    if len(path_parts) > 1:
+        for path_part in path_parts[:-1]:
+            tmp_context = getattr(tmp_context, path_part)
+
+    return tmp_context, path_parts[-1]
+
+
+def run_action(action: SeleniumAction, context: Any) -> Any:
+    """Run an action with the given context.
+
+    Parameters:
+    ----------
+    - action: SeleniumAction
+        The action to run.
+    - context: Any
+        The context to run the action with.
+
+    Returns:
+    --------
+    Any
+        The result of the action.
     """
     # Log the action
-    test_tool_logger.info(action.get("log", f'Action {action["action"]}'))
-    # Action is an extra action that is not part of Selenium
-    if action["action"] in ADD_ACTION:
-        result = call_callable_with_args(
-            ADD_ACTION[action["action"]],
-            get_arguments(action.get("args", None), element),
-        )
-    # Handle native functions
-    elif action["action"].startswith("selenium.webdriver"):
-        result = call_callable_with_args(
-            get_native_function(action["action"]),
-            get_arguments(action.get("args", None), element),
-        )
-    # Check if the action is in the blacklist
-    elif action["action"] in BLACKLIST:
+    test_tool_logger.info(action.get("log", f'Run action {action["action"]}'))
+
+    # Get the new context and the real action
+    tmp_context, real_action = get_new_context_and_action(
+        context, action["action"])
+
+    # Get the arguments
+    arguments = get_arguments(action.get("args", None), context)
+
+    if real_action in BLACKLIST:
         raise ValueError(f'Action {action["action"]} is not allowed.')
-    # Check if the action is available
-    elif action["action"] not in dir(element):
-        raise ValueError(f'Action {action["action"]} is not available.')
-    else:
-        # Call the callable with the arguments
-        result = get_set_or_call_attribute(
-            element,
-            action["action"],
-            get_arguments(action.get("args", None), element),
-        )
 
-    # Get and run the following actions
-    actions = action.get("actions", [])
+    # Call the callable with the arguments
+    result = get_set_or_call_attribute(
+        tmp_context,
+        real_action,
+        arguments,
+    )
+
+    # Get and run the following actions, the context is the result of the current action
+    follow_up_actions: List[SeleniumAction] = action.get("actions", [])
     new_result = result
-    for sub_action in actions:
-        new_result = run_action(sub_action, result)
+    for follow_up_action in follow_up_actions:
+        new_result = run_action(follow_up_action, result)
 
+    # Return the result
     return new_result

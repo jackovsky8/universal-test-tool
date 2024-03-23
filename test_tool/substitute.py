@@ -39,16 +39,16 @@ def replace_string_variables(
     changed: Any = to_change
 
     # Find all variables in the string. Variables are defined as {{foo.bar[0]}}
-    pattern = r"{{[a-zA-Z0-9\_\-\.\[\]\|\:]+}}"
+    pattern = r"{{[a-zA-Z0-9\_\-\.\[\]\|\:\ ]+}}"
     variables = findall(pattern, changed)
     # Replace the variables with the data, if possible
     for variable in variables:
         # Remove {{ and }}
         var = variable[2:-2]
-        # Remove spaces
-        var = var.strip()
         # Split for pipes
         pipes = var.split("|")
+        # Remove whitespace
+        pipes = [pipe.strip() for pipe in pipes]
         # Get the variable
         var = pipes[0]
         # Get the pipes

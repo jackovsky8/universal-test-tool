@@ -6,7 +6,7 @@ import re
 import tempfile
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict, Optional
+from typing import Any, Dict, List, Optional, TypedDict
 from urllib.request import urlretrieve
 
 from jaydebeapi import Cursor, connect  # type: ignore
