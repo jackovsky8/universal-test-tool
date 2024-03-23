@@ -4,6 +4,13 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: improve selenium plugin. [Jakob Graf]
+- Feat: improve selenium plugin. [Jakob Graf]
+
+
+0.1.22 (2024-03-22)
+-------------------
+- Release: version 0.1.22 🚀 [Jakob Graf]
 - Feat: minor bug fixes. [Jakob Graf]
 
 
