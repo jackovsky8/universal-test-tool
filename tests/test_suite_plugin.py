@@ -2,15 +2,15 @@
 This module contains tests for the selenium plugin.
 """
 import sys
-import tempfile
+from tempfile import gettempdir
 from copy import deepcopy
 from pathlib import Path
 from shutil import rmtree
 from typing import Dict
 
 import pytest
-import test_tool_suite_plugin.main as test_tool_suite_plugin
-import yaml
+from test_tool_suite_plugin import default_suite_call, make_suite_call
+from yaml import dump
 
 called: Dict[str, bool] = {}
 
@@ -43,9 +43,9 @@ def test_make_suite_call() -> None:
     Test the make_suite_call function.
     """
 
-    call = deepcopy(test_tool_suite_plugin.default_suite_call)
+    call = deepcopy(default_suite_call)
 
-    temporary_directory = Path(tempfile.gettempdir()).joinpath(
+    temporary_directory = Path(gettempdir()).joinpath(
         "test_tool/config"
     )
     # remove the folder if it exists
@@ -61,7 +61,7 @@ def test_make_suite_call() -> None:
     with open(
         temporary_directory.joinpath("data.yaml"), "w", encoding="UTF-8"
     ) as file:
-        file.write(yaml.dump(test_data))
+        file.write(dump(test_data))
 
     test_config = [
         {
@@ -74,7 +74,7 @@ def test_make_suite_call() -> None:
     with open(
         temporary_directory.joinpath("calls.yaml"), "w", encoding="UTF-8"
     ) as file:
-        file.write(yaml.dump(test_config))
+        file.write(dump(test_config))
 
     test_config_2 = [
         {
@@ -87,14 +87,14 @@ def test_make_suite_call() -> None:
     with open(
         temporary_directory.joinpath("calls_2.yaml"), "w", encoding="UTF-8"
     ) as file:
-        file.write(yaml.dump(test_config_2))
+        file.write(dump(test_config_2))
 
     assert "test_make_suite_call_1" not in called
     call["project"] = temporary_directory.as_posix()
-    test_tool_suite_plugin.make_suite_call(call)
+    make_suite_call(call)
     assert called["test_make_suite_call_1"] is True
 
     assert "test_make_suite_call_2" not in called
     call["calls"] = "calls_2.yaml"
-    test_tool_suite_plugin.make_suite_call(call)
+    make_suite_call(call)
     assert called["test_make_suite_call_2"] is True
