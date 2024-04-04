@@ -4,7 +4,7 @@ CLI interface for test_tool project.
 It is executed when the program is called from the command line.
 """
 from argparse import ArgumentParser
-from logging import INFO, DEBUG, basicConfig
+from logging import DEBUG, INFO, basicConfig
 from os import getcwd
 
 import pkg_resources
@@ -71,10 +71,7 @@ def main() -> None:  # pragma: no cover
     )
 
     parser.add_argument(
-        "-X",
-        "--debug",
-        action="store_true",
-        help="Activate debugging."
+        "-X", "--debug", action="store_true", help="Activate debugging."
     )
 
     # Parse the arguments
