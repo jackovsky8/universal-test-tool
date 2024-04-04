@@ -44,6 +44,10 @@ fmt:              ## Format code using black & isort.
 	# $(ENV_PREFIX)black -l 79 test_tool_sql_plus_plugin/
 	# $(ENV_PREFIX)isort test_tool_ssh_cmd_plugin/
 	# $(ENV_PREFIX)black -l 79 test_tool_ssh_cmd_plugin/
+	$(ENV_PREFIX)isort test_tool_suite_plugin/
+	$(ENV_PREFIX)black -l 79 test_tool_suite_plugin/
+	# $(ENV_PREFIX)isort test_tool_timing_plugin/
+	# $(ENV_PREFIX)black -l 79 test_tool_timing_plugin/
 	$(ENV_PREFIX)black -l 79 tests/
 
 .PHONY: lint
@@ -70,6 +74,10 @@ lint:             ## Run pep8, black, mypy linters.
 	# $(ENV_PREFIX)black -l 79 --check test_tool_sql_plus_plugin/
 	# $(ENV_PREFIX)flake8 test_tool_ssh_cmd_plugin/
 	# $(ENV_PREFIX)black -l 79 --check test_tool_ssh_cmd_plugin/
+	$(ENV_PREFIX)flake8 test_tool_suite_plugin/
+	$(ENV_PREFIX)black -l 79 --check test_tool_suite_plugin/
+	# $(ENV_PREFIX)flake8 test_tool_timing_plugin/
+	# $(ENV_PREFIX)black -l 79 --check test_tool_timing_plugin/
 	$(ENV_PREFIX)black -l 79 --check tests/
 	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool/
 	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool_assert_plugin/
@@ -82,6 +90,8 @@ lint:             ## Run pep8, black, mypy linters.
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_selenium_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_sql_plus_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_ssh_cmd_plugin/
+	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool_suite_plugin/
+	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_timing_plugin/
 
 .PHONY: lint
 test: lint        ## Run tests and generate coverage report.

@@ -61,6 +61,7 @@ setup(
             "test-tool-selenium-plugin = test_tool_selenium_plugin.__main__:main",
             "test-tool-sql-plus-plugin = test_tool_sql_plus_plugin.__main__:main",
             "test-tool-ssh-cmd-plugin = test_tool_ssh_cmd_plugin.__main__:main",
+            "test-tool-suite-plugin = test_tool_suite_plugin.__main__:main",
             "test-tool-timing-plugin = test_tool_timing_plugin.__main__:main",
         ]
     },
