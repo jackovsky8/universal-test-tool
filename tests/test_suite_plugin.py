@@ -45,9 +45,7 @@ def test_make_suite_call() -> None:
 
     call = deepcopy(default_suite_call)
 
-    temporary_directory = Path(gettempdir()).joinpath(
-        "test_tool/config"
-    )
+    temporary_directory = Path(gettempdir()).joinpath("test_tool/config")
     # remove the folder if it exists
     rmtree(temporary_directory, ignore_errors=True)
     # create the folder

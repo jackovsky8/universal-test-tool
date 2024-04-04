@@ -1,11 +1,11 @@
 """
 In this file, we import the necessary modules for the test tool to run.
 """
+from copy import deepcopy
 from importlib import import_module
 from logging import getLogger
 from types import FunctionType
 from typing import Any, Callable, Dict, TypedDict
-from copy import deepcopy
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")
