@@ -8,6 +8,7 @@ from logging import DEBUG, INFO, basicConfig
 from os import getcwd
 
 import pkg_resources
+
 from test_tool.base import run_tests
 
 

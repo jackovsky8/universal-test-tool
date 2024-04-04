@@ -38,6 +38,8 @@ fmt:              ## Format code using black & isort.
 	# $(ENV_PREFIX)black -l 79 test_tool_rest_plugin/
 	# $(ENV_PREFIX)isort test_tool_run_process_plugin/
 	# $(ENV_PREFIX)black -l 79 test_tool_run_process_plugin/
+	$(ENV_PREFIX)isort test_tool_secret_plugin/
+	$(ENV_PREFIX)black -l 79 test_tool_secret_plugin/
 	# $(ENV_PREFIX)isort test_tool_selenium_plugin/
 	# $(ENV_PREFIX)black -l 79 test_tool_selenium_plugin/
 	# $(ENV_PREFIX)isort test_tool_sql_plus_plugin/
@@ -68,6 +70,8 @@ lint:             ## Run pep8, black, mypy linters.
 	# $(ENV_PREFIX)black -l 79 --check test_tool_rest_plugin/
 	# $(ENV_PREFIX)flake8 test_tool_run_process_plugin/
 	# $(ENV_PREFIX)black -l 79 --check test_tool_run_process_plugin/
+	$(ENV_PREFIX)flake8 test_tool_secret_plugin/
+	$(ENV_PREFIX)black -l 79 --check test_tool_secret_plugin/
 	# $(ENV_PREFIX)flake8 test_tool_selenium_plugin/
 	# $(ENV_PREFIX)black -l 79 --check test_tool_selenium_plugin/
 	# $(ENV_PREFIX)flake8 test_tool_sql_plus_plugin/
@@ -87,6 +91,7 @@ lint:             ## Run pep8, black, mypy linters.
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_read_jar_manifest_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_rest_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_run_process_plugin/
+	$(ENV_PREFIX)mypy --ignore-missing-imports test_tool_secret_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_selenium_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_sql_plus_plugin/
 	# $(ENV_PREFIX)mypy --ignore-missing-imports test_tool_ssh_cmd_plugin/

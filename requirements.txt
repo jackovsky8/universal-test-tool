@@ -13,3 +13,7 @@ types-requests
 selenium
 webdriver_manager
 pyyaml
+keyring>=25.0.0
+keyring-pybridge>=0.4.0
+xmltodict>=0.13.0
+types-xmltodict

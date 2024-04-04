@@ -12,3 +12,4 @@ mkdocs-material
 testcontainers
 setuptools
 types-setuptools
+mock
