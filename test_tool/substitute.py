@@ -3,7 +3,7 @@ This module contains the functions to substitute variables.
 """
 from logging import getLogger
 from re import findall, search, sub
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")
@@ -60,7 +60,7 @@ def replace_string_variables(
         # Keep track for logging
         log_path = "data"
         # Get the value
-        value: Dict[str, Any] | List[Any] | str = data
+        value: Union[Dict[str, Any], List[Any], str] = data
         for key in keys:
             is_list = search(list_pattern, key)
             if is_list:
