@@ -4,7 +4,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import TypedDict
 
-from test_tool import run_tests
+from test_tool.base import run_tests
 
 # Get the logger
 test_tool_logger = getLogger("test-tool")
