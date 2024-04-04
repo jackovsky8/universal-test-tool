@@ -4,6 +4,40 @@ Changelog
 
 (unreleased)
 ------------
+- Feat: secret plugin. [Jakob Graf]
+- Feat: secret plugin. [Jakob Graf]
+- Feat: cleanup. [Jakob Graf]
+- Feat: cleanup. [Jakob Graf]
+- Feat: cleanup. [Jakob Graf]
+- Feat: suite plugin. [Jakob Graf]
+- Feat: cleanup. [Jakob Graf]
+- Feat: suite plugin. [Jakob Graf]
+- Feat: suite plugin. [Jakob Graf]
+- Feat: suite plugin. [Jakob Graf]
+- Merge pull request #6 from
+  jackovsky8/dependabot/github_actions/actions/checkout-4. [Graf Jakob]
+
+  build(deps): bump actions/checkout from 1 to 4
+- Build(deps): bump actions/checkout from 1 to 4. [dependabot[bot]]
+
+  Bumps [actions/checkout](https://github.com/actions/checkout) from 1 to 4.
+  - [Release notes](https://github.com/actions/checkout/releases)
+  - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/actions/checkout/compare/v1...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/checkout
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Feat: reformatting base module. [Jakob Graf]
+- Feat: improve selenium plugin. [Jakob Graf]
+
+
+0.1.23 (2024-03-23)
+-------------------
+- Release: version 0.1.23 🚀 [Jakob Graf]
 - Feat: improve selenium plugin. [Jakob Graf]
 - Feat: improve selenium plugin. [Jakob Graf]
 
